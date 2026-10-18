@@ -1,6 +1,3 @@
-"""Additional services and dining menu (data only). Prices are in PHP."""
-
-# Edit these freely.
 ADDITIONAL_SERVICES = {
     "Extra Bed": 500.00,
     "Extra Pillow & Blanket Set": 150.00,
@@ -10,7 +7,6 @@ ADDITIONAL_SERVICES = {
     "Spa Massage": 1500.00,
 }
 
-# The image is looked up in the "foods" folder.
 DINING_MENU = {
     "Cheese Burger": {"price": 300.00, "image": "burger.jpg"},
     "Fruit Platter": {"price": 500.00, "image": "fruits.jpg"},
