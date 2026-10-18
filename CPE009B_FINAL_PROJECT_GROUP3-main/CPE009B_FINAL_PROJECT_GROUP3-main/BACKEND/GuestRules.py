@@ -1,4 +1,3 @@
-#draft pa lang to
 MINIMUM_GUESTS = 2
 
 class GuestInfo:

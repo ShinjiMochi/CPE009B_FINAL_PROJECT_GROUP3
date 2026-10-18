@@ -1,4 +1,3 @@
-#draft pa lang to
 #10% promo discount
 DISCOUNT_RATE = 0.10
 
