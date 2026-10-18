@@ -1,4 +1,5 @@
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, QRegularExpression
+from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
     QLabel, QLineEdit, QTextEdit, QPushButton
@@ -22,6 +23,10 @@ class CustomerDetails(QWidget):
         self.name_input = QLineEdit()
         self.contact_input = QLineEdit()
         self.contact_input.setPlaceholderText("09XXXXXXXXX")
+        self.contact_input.setMaxLength(11)   # digits only, 11 max
+        self.contact_input.setValidator(
+            QRegularExpressionValidator(QRegularExpression("[0-9]*"))
+        )
         self.email_input = QLineEdit()
         self.address_input = QLineEdit()
         self.requests_input = QTextEdit()
