@@ -1,58 +1,85 @@
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QTextEdit,
-    QSpinBox, QPushButton
+    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
+    QLabel, QLineEdit, QTextEdit, QPushButton
 )
 
+from CustomerRules import validate_customer, create_customer_info
+
+
 class CustomerDetails(QWidget):
+    continued = pyqtSignal(dict)
+    back_requested = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout(self)
+
         title = QLabel("Customer Details")
-        title.setStyleSheet(
-            "font-size: 28px; font-weight: bold;"
+        title.setStyleSheet("font-size: 28px; font-weight: bold;")
+        layout.addWidget(title)
+
+        self.name_input = QLineEdit()
+        self.contact_input = QLineEdit()
+        self.contact_input.setPlaceholderText("09XXXXXXXXX")
+        self.email_input = QLineEdit()
+        self.address_input = QLineEdit()
+        self.requests_input = QTextEdit()
+        self.requests_input.setFixedHeight(100)
+
+        self.fields = {
+            "full_name": ("Full Name:", self.name_input),
+            "contact_number": ("Contact Number:", self.contact_input),
+            "email": ("Email:", self.email_input),
+            "address": ("Address:", self.address_input),
+            "special_requests": ("Special Requests (optional):", self.requests_input),
+        }
+        self.error_labels = {}
+
+        form = QGridLayout()
+        for row, (key, (text, widget)) in enumerate(self.fields.items()):
+            form.addWidget(QLabel(text), row, 0)
+            form.addWidget(widget, row, 1)
+            error = QLabel()
+            error.setStyleSheet("color: red;")
+            self.error_labels[key] = error
+            form.addWidget(error, row, 2)
+        form.setColumnStretch(1, 1)
+        layout.addLayout(form)
+        layout.addStretch()
+
+        buttons = QHBoxLayout()
+        back = QPushButton("Back")
+        continue_button = QPushButton("Continue")
+        buttons.addWidget(back)
+        buttons.addStretch()
+        buttons.addWidget(continue_button)
+        layout.addLayout(buttons)
+
+        back.clicked.connect(self.back_requested.emit)
+        continue_button.clicked.connect(self.on_continue)
+
+    def values(self):
+        return (
+            self.name_input.text(),
+            self.contact_input.text(),
+            self.email_input.text(),
+            self.address_input.text(),
+            self.requests_input.toPlainText()
         )
 
-        layout.addWidget(title)
-        form = QGridLayout()
-        form.addWidget(
-            QLabel("Full Name:"), 0, 0
-        )
-        form.addWidget(
-            QLineEdit(), 0, 1
-        )
-        form.addWidget(
-            QLabel("Contact Number:"), 1, 0
-        )
-        form.addWidget(
-            QLineEdit(), 1, 1
-        )
-        form.addWidget(
-            QLabel("Email:"), 2, 0
-        )
-        form.addWidget(
-            QLineEdit(), 2, 1
-        )
-        form.addWidget(
-            QLabel("Address:"), 3, 0
-        )
-        form.addWidget(
-            QLineEdit(), 3, 1
-        )
-        form.addWidget(
-            QLabel("Guests:"), 4, 0
-        )
-        form.addWidget(
-            QSpinBox(), 4, 1
-        )
-        form.addWidget(
-            QLabel("Special Requests:"), 5, 0
-        )
-        form.addWidget(
-            QTextEdit(), 5, 1
-        )
-        layout.addLayout(form)
-        layout.addWidget(
-            QPushButton("Continue")
-        )
+    def on_continue(self):
+        errors = validate_customer(*self.values())
+
+        for key, label in self.error_labels.items():
+            label.setText(errors.get(key, ""))
+
+        if errors:
+            return
+
+        self.continued.emit(create_customer_info(*self.values()))
+
+    def reset(self):
+        for key, (_, widget) in self.fields.items():
+            widget.clear()
+            self.error_labels[key].clear()
