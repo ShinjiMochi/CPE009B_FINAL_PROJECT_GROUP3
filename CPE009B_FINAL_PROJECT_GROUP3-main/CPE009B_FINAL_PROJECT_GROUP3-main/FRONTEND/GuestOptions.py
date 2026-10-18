@@ -1,9 +1,4 @@
-
-#draft pa lang to
-import os
-
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QGroupBox, QScrollArea,
     QLabel, QSpinBox, QCheckBox, QPushButton, QMessageBox
@@ -11,33 +6,7 @@ from PyQt6.QtWidgets import (
 
 from GuestRules import validate_guests, create_guest_info, MINIMUM_GUESTS
 from DiscountManager import apply_discount, DISCOUNT_RATE
-
-
-IMAGE_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
-
-
-class ImageBox(QLabel):
-    def __init__(self, name, width, height):
-        super().__init__()
-        self.setFixedSize(width, height)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        pixmap = QPixmap()
-        for extension in (".jpg", ".jpeg", ".png"):
-            path = os.path.join(IMAGE_FOLDER, name + extension)
-            if os.path.exists(path):
-                pixmap = QPixmap(path)
-                break
-
-        if pixmap.isNull():
-            self.setText(f"[ Image here ]\n{name}")
-            self.setStyleSheet("background: #eeeeee; border: 1px dashed gray;")
-        else:
-            self.setPixmap(pixmap.scaled(
-                width, height,
-                Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                Qt.TransformationMode.SmoothTransformation
-            ))
+from widgets import ImageBox
 
 
 class GuestOptions(QWidget):
@@ -47,7 +16,6 @@ class GuestOptions(QWidget):
     def __init__(self, services=None):
         super().__init__()
 
-        #services 
         self.services = services or {}
         self.service_checkboxes = {}
         self.room_name = ""
@@ -56,7 +24,7 @@ class GuestOptions(QWidget):
         form = QWidget()
         form_layout = QVBoxLayout(form)
 
-        title = QLabel("Guest Options - Draft")
+        title = QLabel("Guest Options")
         title.setStyleSheet("font-size: 28px; font-weight: bold;")
         form_layout.addWidget(ImageBox("image", 700, 130))
         form_layout.addWidget(title)
@@ -121,7 +89,7 @@ class GuestOptions(QWidget):
         return box
 
     def make_discount_box(self):
-        box = QGroupBox("Discount Account (optional) - Draft")
+        box = QGroupBox("Discount Account (optional)")
         layout = QHBoxLayout(box)
         layout.addWidget(ImageBox("discount", 100, 100), alignment=Qt.AlignmentFlag.AlignTop)
 
@@ -139,7 +107,7 @@ class GuestOptions(QWidget):
         return box
 
     def make_services_box(self):
-        box = QGroupBox("Additional Services - Draft")
+        box = QGroupBox("Additional Services")
         layout = QGridLayout(box)
 
         if not self.services:
@@ -261,11 +229,10 @@ if __name__ == "__main__":
     import sys
     from PyQt6.QtWidgets import QApplication
 
-    #Draft data only
-    draft_services = {"Service A": 100, "Service B": 250, "Service C": 400}
+    from Services import get_additional_services
 
     app = QApplication(sys.argv)
-    screen = GuestOptions(draft_services)
+    screen = GuestOptions(get_additional_services())
     screen.set_room_charge(1500, "Econo")
     screen.continued.connect(print)
     screen.resize(1100, 700)
