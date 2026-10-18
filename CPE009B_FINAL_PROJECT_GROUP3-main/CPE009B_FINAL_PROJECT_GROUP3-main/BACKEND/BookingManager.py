@@ -72,6 +72,10 @@ class BookingManager:
 
         lines.append(f"Room Type: {booking['room_type']}")
         lines.append(f"Duration: {booking['duration']} {booking['duration_type']}")
+        if booking.get("check_in"):
+            lines.append(f"Check-in: {booking['check_in']}")
+        if booking.get("check_out"):
+            lines.append(f"Check-out: {booking['check_out']}")
 
         guests = booking.get("guests")
         if guests:
@@ -189,6 +193,8 @@ class BookingManager:
                 "room_type": data["Room Type"],
                 "duration_type": duration_type,
                 "duration": int(duration),
+                "check_in": data.get("Check-in"),
+                "check_out": data.get("Check-out"),
                 "guests": guests,
                 "room_charge": self._money(data["Room Charge"]) if "Room Charge" in data else total_price,
                 "discount": discount,
@@ -231,7 +237,9 @@ class BookingManager:
         email=None,
         payment_method=None,
         payment_provider=None,
-        payment_details=None
+        payment_details=None,
+        check_in=None,
+        check_out=None
     ):
         """
         The first four arguments work exactly like before; the rest are optional.
@@ -240,9 +248,21 @@ class BookingManager:
         services: [{"name": ..., "price": ...}]
         dining:   [{"name": ..., "price": ..., "quantity": ...}]
         payment_method: "Cash", "E-Wallet / E-Banking" or "Card" (see PaymentManager)
+        check_in, check_out: ISO strings like "2026-10-20T14:00" (or datetimes)
         """
         if not customer_name.strip():
             raise ValueError("Customer name cannot be empty.")
+
+        if check_in is not None or check_out is not None:
+            try:
+                start = datetime.fromisoformat(str(check_in))
+                end = datetime.fromisoformat(str(check_out))
+            except ValueError:
+                raise ValueError("Invalid check-in or check-out date.")
+            if end <= start:
+                raise ValueError("Check-out must be after check-in.")
+            check_in = start.isoformat(timespec="minutes")
+            check_out = end.isoformat(timespec="minutes")
 
         room_charge = self.calculate_price(room, duration_type, duration)
         discount = apply_discount(room_charge, use_discount)
@@ -275,6 +295,8 @@ class BookingManager:
             "room_type": room.room_type,
             "duration_type": duration_type,
             "duration": duration,
+            "check_in": check_in,
+            "check_out": check_out,
             "guests": guests,
             "room_charge": room_charge,
             "discount": discount,
