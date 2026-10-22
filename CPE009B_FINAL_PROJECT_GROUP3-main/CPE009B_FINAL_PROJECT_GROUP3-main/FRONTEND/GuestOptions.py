@@ -1,3 +1,4 @@
+import os
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout, QGroupBox, QScrollArea,
@@ -6,8 +7,7 @@ from PyQt6.QtWidgets import (
 
 from GuestRules import validate_guests, create_guest_info, MINIMUM_GUESTS
 from DiscountManager import apply_discount, DISCOUNT_RATE
-from widgets import ImageBox
-
+from widgets import ImageBox, IMAGE_FOLDER
 
 class GuestOptions(QWidget):
     continued = pyqtSignal(dict)
@@ -110,20 +110,48 @@ class GuestOptions(QWidget):
         box = QGroupBox("Additional Services")
         layout = QGridLayout(box)
 
+        service_images = {
+            "Airport Transfer": "airport_transfer",
+            "Extra Bed": "extra_bed",
+            "Extra Pillow & Blanket Set": "extra_pillow_blanket_set",
+            "Late Check-out": "late_check_out",
+            "Laundry Service": "laundry_service",
+            "Spa Massage": "spa_massage",
+        }
+
         if not self.services:
             layout.addWidget(QLabel("No services available yet."), 0, 0)
 
         for index, (name, price) in enumerate(self.services.items()):
             item = QVBoxLayout()
-            image_name = "services"
-            item.addWidget(ImageBox(image_name, 150, 100), alignment=Qt.AlignmentFlag.AlignCenter)
-            item.addWidget(QLabel(f"{name} - ₱{price:,.2f}"), alignment=Qt.AlignmentFlag.AlignCenter)
+
+            image_name = service_images.get(name, "services")
+            
+            item.addWidget(
+                ImageBox(
+                    image_name,
+                    150,
+                    100,
+                    folder=os.path.join(IMAGE_FOLDER, "services")
+                ),
+                alignment=Qt.AlignmentFlag.AlignCenter
+            )
+
+            item.addWidget(
+                QLabel(f"{name} - ₱{price:,.2f}"),
+                alignment=Qt.AlignmentFlag.AlignCenter
+            )
 
             checkbox = QCheckBox("Add")
             self.service_checkboxes[name] = checkbox
-            item.addWidget(checkbox, alignment=Qt.AlignmentFlag.AlignCenter)
+
+            item.addWidget(
+                checkbox,
+                alignment=Qt.AlignmentFlag.AlignCenter
+            )
 
             layout.addLayout(item, index // 3, index % 3)
+
         return box
 
     def make_summary_box(self):
