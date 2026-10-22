@@ -11,6 +11,7 @@ IMAGE_FOLDER = BASE_FOLDER
 
 
 class ImageBox(QLabel):
+    """Shows folder/name.jpg|jpeg|png, or a gray placeholder if it's missing."""
 
     def __init__(self, name, width, height, folder=IMAGE_FOLDER):
         super().__init__()

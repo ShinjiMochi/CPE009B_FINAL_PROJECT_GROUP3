@@ -17,8 +17,8 @@ class Room:
 
 
 ROOM_DATA = {
-    "Econo": Room(
-        room_type="Econo",
+    "Economy": Room(
+        room_type="Economy",
         hourly_rate=1100 / 12,
         daily_rate=1500,
         description="A simple and affordable room for short stays.",
@@ -27,7 +27,8 @@ ROOM_DATA = {
             "Air conditioning",
             "Private bathroom",
             "Hot shower",
-            "Wi-Fi"
+            "Wi-Fi",
+            "Smart TV"
         ],
         image="Econo.jpg"
     ),
