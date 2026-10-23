@@ -1,11 +1,11 @@
 from PyQt6.QtCore import pyqtSignal, QRegularExpression
 from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QTextEdit, QPushButton
+    QWidget, QVBoxLayout, QGridLayout, QLabel, QLineEdit, QTextEdit
 )
 
-from BACKEND.CustomerRules import validate_customer, create_customer_info
+from logic import validate_customer, create_customer_info
+from ui_common import make_title, make_nav_buttons
 
 
 class CustomerDetails(QWidget):
@@ -15,10 +15,7 @@ class CustomerDetails(QWidget):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout(self)
-
-        title = QLabel("Customer Details")
-        title.setStyleSheet("font-size: 28px; font-weight: bold;")
-        layout.addWidget(title)
+        layout.addWidget(make_title("Customer Details"))
 
         self.name_input = QLineEdit()
         self.contact_input = QLineEdit()
@@ -53,12 +50,7 @@ class CustomerDetails(QWidget):
         layout.addLayout(form)
         layout.addStretch()
 
-        buttons = QHBoxLayout()
-        back = QPushButton("Back")
-        continue_button = QPushButton("Continue")
-        buttons.addWidget(back)
-        buttons.addStretch()
-        buttons.addWidget(continue_button)
+        buttons, back, continue_button = make_nav_buttons()
         layout.addLayout(buttons)
 
         back.clicked.connect(self.back_requested.emit)
