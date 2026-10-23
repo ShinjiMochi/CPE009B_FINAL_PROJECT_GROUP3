@@ -1,16 +1,80 @@
 from datetime import datetime, timedelta
 
 from PyQt6.QtCore import pyqtSignal, QDate, QTime, Qt
+from PyQt6.QtGui import QColor, QFont, QPainter, QTextCharFormat
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel,
     QRadioButton, QSpinBox, QCalendarWidget, QTimeEdit
 )
-from PyQt6.QtGui import QColor, QTextCharFormat
 
 from logic import calculate_price
 from ui_common import make_title, make_nav_buttons, TEXT
 
 DISPLAY_FORMAT = "%b %d, %Y %I:%M %p"
+
+
+class StayCalendar(QCalendarWidget):
+    """Calendar that highlights the check-in day, the check-out day and
+    every day in between. Painted by hand so the app stylesheet can't hide it."""
+
+    STAY_BLUE = QColor("#1a56db")
+    STAY_TINT = QColor(26, 86, 219, 45)
+
+    def __init__(self):
+        super().__init__()
+        self.stay_start = None
+        self.stay_end = None
+
+    def set_stay(self, start, end):
+        """start and end are QDate values (check-in day, check-out day)."""
+        self.stay_start, self.stay_end = start, end
+        self.updateCells()
+
+    def paintCell(self, painter, rect, date):
+        super().paintCell(painter, rect, date)
+
+        start, end = self.stay_start, self.stay_end
+        if start is None or end is None or not (start <= date <= end):
+            return
+
+        painter.save()
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        if date == start and date == end:
+            self._draw_solid(painter, rect, date, "Check-in / out")
+        elif date == start:
+            self._draw_solid(painter, rect, date, "Check-in")
+        elif date == end:
+            self._draw_solid(painter, rect, date, "Check-out")
+        else:
+            painter.fillRect(rect, self.STAY_TINT)
+
+        painter.restore()
+
+    def _draw_solid(self, painter, rect, date, label):
+        """Solid blue cell with the day number and a small label under it."""
+        painter.fillRect(rect, self.STAY_BLUE)
+        painter.setPen(QColor("white"))
+
+        number_font = QFont(painter.font())
+        number_font.setBold(True)
+        painter.setFont(number_font)
+        painter.drawText(
+            rect.adjusted(0, 0, 0, -6),
+            Qt.AlignmentFlag.AlignCenter,
+            str(date.day())
+        )
+
+        label_font = QFont(painter.font())
+        label_font.setPointSize(7)
+        label_font.setBold(False)
+        painter.setFont(label_font)
+        painter.drawText(
+            rect.adjusted(0, 0, 0, -4),
+            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom,
+            label
+        )
+
 
 class StayDuration(QWidget):
     # emits: duration_type, duration, room_charge, check_in, check_out
@@ -40,7 +104,7 @@ class StayDuration(QWidget):
         # ----- left: calendar -----
         calendar_box = QGroupBox("Check-in date")
         calendar_layout = QVBoxLayout(calendar_box)
-        self.calendar = QCalendarWidget()
+        self.calendar = StayCalendar()
         self.calendar.setGridVisible(True)
         self.calendar.setMinimumDate(QDate.currentDate())
 
@@ -119,7 +183,6 @@ class StayDuration(QWidget):
         self.mark_past_dates()
         self.update_total()
 
-    # ---------- helpers ----------
     def duration_type(self):
         return "Hourly" if self.hourly_radio.isChecked() else "Daily"
 
@@ -168,6 +231,12 @@ class StayDuration(QWidget):
         self.checkin_label.setText(f"Check-in:  {check_in.strftime(DISPLAY_FORMAT)}")
         self.checkout_label.setText(f"Check-out: {check_out.strftime(DISPLAY_FORMAT)}")
 
+        # highlight check-in, check-out and the days between on the calendar
+        self.calendar.set_stay(
+            QDate(check_in.year, check_in.month, check_in.day),
+            QDate(check_out.year, check_out.month, check_out.day)
+        )
+
         valid = self.check_in_is_valid(check_in)
         self.warning_label.setText("" if valid else "Check-in can't be in the past.")
 
@@ -210,9 +279,9 @@ class StayDuration(QWidget):
 
         first = QDate(
             self.calendar.yearShown(), self.calendar.monthShown(), 1
-        ).addDays(-7)               # also covers the trailing days of last month
+        ).addDays(-7)             
         today = QDate.currentDate()
-        for offset in range(50):    # enough to cover the whole visible grid
+        for offset in range(50):
             day = first.addDays(offset)
             if day < today:
                 self.calendar.setDateTextFormat(day, past)
