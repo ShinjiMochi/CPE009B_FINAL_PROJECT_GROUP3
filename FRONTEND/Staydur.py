@@ -1,15 +1,16 @@
 from datetime import datetime, timedelta
 
-from PyQt6.QtCore import pyqtSignal, QDate, QTime
+from PyQt6.QtCore import pyqtSignal, QDate, QTime, Qt
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QLabel,
-    QRadioButton, QSpinBox, QPushButton, QCalendarWidget, QTimeEdit
+    QRadioButton, QSpinBox, QCalendarWidget, QTimeEdit
 )
+from PyQt6.QtGui import QColor, QTextCharFormat
 
-from BACKEND.BookingManager import booking_manager
+from logic import calculate_price
+from ui_common import make_title, make_nav_buttons, TEXT
 
 DISPLAY_FORMAT = "%b %d, %Y %I:%M %p"
-
 
 class StayDuration(QWidget):
     # emits: duration_type, duration, room_charge, check_in, check_out
@@ -21,10 +22,7 @@ class StayDuration(QWidget):
         self.room = None
 
         layout = QVBoxLayout(self)
-
-        title = QLabel("Stay Duration")
-        title.setStyleSheet("font-size: 28px; font-weight: bold;")
-        layout.addWidget(title)
+        layout.addWidget(make_title("Stay Duration"))
 
         self.room_label = QLabel()
         self.room_label.setStyleSheet("font-size: 16px; font-weight: bold;")
@@ -45,6 +43,19 @@ class StayDuration(QWidget):
         self.calendar = QCalendarWidget()
         self.calendar.setGridVisible(True)
         self.calendar.setMinimumDate(QDate.currentDate())
+
+        day_format = QTextCharFormat()
+        day_format.setForeground(QColor(TEXT))
+        self.calendar.setHeaderTextFormat(day_format)
+        self.calendar.setWeekdayTextFormat(Qt.DayOfWeek.Saturday, day_format)
+        self.calendar.setWeekdayTextFormat(Qt.DayOfWeek.Sunday, day_format)
+
+        self.calendar.currentPageChanged.connect(self.mark_past_dates)
+
+        self.calendar.setVerticalHeaderFormat(
+            QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader
+        )
+
         calendar_layout.addWidget(self.calendar)
         columns.addWidget(calendar_box, 3)
 
@@ -94,12 +105,7 @@ class StayDuration(QWidget):
         columns.addWidget(details_box, 2)
         layout.addLayout(columns)
 
-        buttons = QHBoxLayout()
-        back = QPushButton("Back")
-        self.continue_button = QPushButton("Continue")
-        buttons.addWidget(back)
-        buttons.addStretch()
-        buttons.addWidget(self.continue_button)
+        buttons, back, self.continue_button = make_nav_buttons()
         layout.addLayout(buttons)
 
         back.clicked.connect(self.back_requested.emit)
@@ -110,6 +116,7 @@ class StayDuration(QWidget):
         self.time_edit.timeChanged.connect(self.update_total)
 
         self.set_default_checkin()
+        self.mark_past_dates()
         self.update_total()
 
     # ---------- helpers ----------
@@ -169,7 +176,7 @@ class StayDuration(QWidget):
             self.continue_button.setEnabled(False)
             return
 
-        total = booking_manager.calculate_price(
+        total = calculate_price(
             self.room, self.duration_type(), self.duration_spin.value()
         )
         self.total_label.setText(f"Room charge: ₱{total:,.2f}")
@@ -184,7 +191,7 @@ class StayDuration(QWidget):
             self.update_total()
             return
 
-        room_charge = booking_manager.calculate_price(
+        room_charge = calculate_price(
             self.room, self.duration_type(), self.duration_spin.value()
         )
         self.continued.emit({
@@ -194,6 +201,21 @@ class StayDuration(QWidget):
             "check_in": check_in.isoformat(timespec="minutes"),
             "check_out": self.get_check_out(check_in).isoformat(timespec="minutes")
         })
+
+    def mark_past_dates(self, *args):
+        """Shades every date before today so it looks unselectable."""
+        past = QTextCharFormat()
+        past.setForeground(QColor("#9aa3b2"))
+        past.setBackground(QColor("#eceef2"))
+
+        first = QDate(
+            self.calendar.yearShown(), self.calendar.monthShown(), 1
+        ).addDays(-7)               # also covers the trailing days of last month
+        today = QDate.currentDate()
+        for offset in range(50):    # enough to cover the whole visible grid
+            day = first.addDays(offset)
+            if day < today:
+                self.calendar.setDateTextFormat(day, past)
 
     def reset(self):
         self.daily_radio.setChecked(True)
