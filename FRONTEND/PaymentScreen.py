@@ -1,22 +1,13 @@
-from datetime import datetime
-
 from PyQt6.QtCore import pyqtSignal, QRegularExpression
 from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QFormLayout,
-    QLabel, QComboBox, QLineEdit, QDoubleSpinBox, QPushButton
+    QLabel, QComboBox, QLineEdit, QDoubleSpinBox
 )
 
-from BACKEND.DiscountManager import calculate_final_total
-from BACKEND.PaymentManager import get_payment_methods
-
-
-def format_when(text):
-    try:
-        return datetime.fromisoformat(text).strftime("%b %d, %Y %I:%M %p")
-    except (TypeError, ValueError):
-        return "-"
-
+from logic import calculate_totals, format_when
+from managers import get_payment_methods
+from ui_common import make_title, make_nav_buttons
 
 class PaymentScreen(QWidget):
     pay_requested = pyqtSignal(dict)    # {"method", "provider", "details"}
@@ -26,9 +17,6 @@ class PaymentScreen(QWidget):
         super().__init__()
         self.total = 0.0
         self.methods = get_payment_methods()
-
-        title = QLabel("Payment")
-        title.setStyleSheet("font-size: 28px; font-weight: bold;")
 
         # ----- summary -----
         summary_box = QGroupBox("Booking Summary")
@@ -82,20 +70,15 @@ class PaymentScreen(QWidget):
         pay_layout.addWidget(self.card_box)
         pay_layout.addStretch()
 
-        # ----- buttons -----
-        buttons = QHBoxLayout()
-        back = QPushButton("Back")
-        self.pay_button = QPushButton("Pay")
-        buttons.addWidget(back)
-        buttons.addStretch()
-        buttons.addWidget(self.pay_button)
-
+        # ----- layout -----
         columns = QHBoxLayout()
         columns.addWidget(summary_box, 1)
         columns.addWidget(pay_box, 1)
 
+        buttons, back, self.pay_button = make_nav_buttons(next_text="Pay")
+
         layout = QVBoxLayout(self)
-        layout.addWidget(title)
+        layout.addWidget(make_title("Payment"))
         layout.addLayout(columns)
         layout.addLayout(buttons)
 
@@ -117,9 +100,14 @@ class PaymentScreen(QWidget):
 
     def set_summary(self, data):
         """data is the booking dict collected by main.py."""
-        discount = data["discount"]
-        dining_total = sum(i["price"] * i["quantity"] for i in data["dining"])
-        self.total = calculate_final_total(discount, dining_total, data["services_total"])
+        totals = calculate_totals(
+            data["room_charge"],
+            data["discount"]["discount_used"],
+            data["services"],
+            data["dining"]
+        )
+        discount = totals["discount"]
+        self.total = totals["total"]
 
         customer = data["customer"]
         guests = data["guests"]
