@@ -1,13 +1,13 @@
 import math
 
-from PyQt6.QtCore import Qt, QPoint, QRect, QSize, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QFrame, QScrollArea, QLayout,
+    QWidget, QVBoxLayout, QHBoxLayout, QFrame, QScrollArea,
     QLabel, QCheckBox, QComboBox, QSlider, QPushButton
 )
 
-from BACKEND.RoomTypes import get_all_rooms
-from FRONTEND.widgets import ImageBox
+from logic import get_all_rooms
+from ui_common import ImageBox, FlowLayout
 
 SORT_OPTIONS = ["Recommended", "Price: low to high", "Price: high to low"]
 PRICE_STEP = 50
@@ -20,65 +20,6 @@ def make_label(text, name=None, word_wrap=False):
         label.setObjectName(name)
     label.setWordWrap(word_wrap)
     return label
-
-
-class FlowLayout(QLayout):
-    """Lays widgets out left to right and wraps to a new row when the
-    space runs out, so the amenity chips never push the card too wide."""
-
-    def __init__(self, spacing=6):
-        super().__init__()
-        self._items = []
-        self._gap = spacing
-        self.setContentsMargins(0, 0, 0, 0)
-
-    def addItem(self, item):
-        self._items.append(item)
-
-    def count(self):
-        return len(self._items)
-
-    def itemAt(self, index):
-        return self._items[index] if 0 <= index < len(self._items) else None
-
-    def takeAt(self, index):
-        return self._items.pop(index) if 0 <= index < len(self._items) else None
-
-    def expandingDirections(self):
-        return Qt.Orientation(0)
-
-    def hasHeightForWidth(self):
-        return True
-
-    def heightForWidth(self, width):
-        return self._arrange(QRect(0, 0, width, 0), apply=False)
-
-    def setGeometry(self, rect):
-        super().setGeometry(rect)
-        self._arrange(rect, apply=True)
-
-    def sizeHint(self):
-        return self.minimumSize()
-
-    def minimumSize(self):
-        size = QSize()
-        for item in self._items:
-            size = size.expandedTo(item.minimumSize())
-        return size
-
-    def _arrange(self, rect, apply):
-        x, y, row_height = rect.x(), rect.y(), 0
-        for item in self._items:
-            hint = item.sizeHint()
-            if x + hint.width() > rect.right() + 1 and row_height > 0:
-                x = rect.x()
-                y += row_height + self._gap
-                row_height = 0
-            if apply:
-                item.setGeometry(QRect(QPoint(x, y), hint))
-            x += hint.width() + self._gap
-            row_height = max(row_height, hint.height())
-        return y + row_height - rect.y()
 
 
 class RoomSelectionScreen(QWidget):
