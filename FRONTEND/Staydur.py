@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
 )
 
 from logic import calculate_price
-from ui_common import make_title, make_nav_buttons, TEXT
+from ui_common import make_title, make_nav_buttons, TEXT, ACCENT
 
 DISPLAY_FORMAT = "%b %d, %Y %I:%M %p"
 
@@ -17,8 +17,8 @@ class StayCalendar(QCalendarWidget):
     """Calendar that highlights the check-in day, the check-out day and
     every day in between. Painted by hand so the app stylesheet can't hide it."""
 
-    STAY_BLUE = QColor("#1a56db")
-    STAY_TINT = QColor(26, 86, 219, 45)
+    STAY_GOLD = QColor(ACCENT)
+    STAY_TINT = QColor(156, 106, 29, 55)
 
     def __init__(self):
         super().__init__()
@@ -52,8 +52,8 @@ class StayCalendar(QCalendarWidget):
         painter.restore()
 
     def _draw_solid(self, painter, rect, date, label):
-        """Solid blue cell with the day number and a small label under it."""
-        painter.fillRect(rect, self.STAY_BLUE)
+        """Solid gold cell with the day number and a small label under it."""
+        painter.fillRect(rect, self.STAY_GOLD)
         painter.setPen(QColor("white"))
 
         number_font = QFont(painter.font())
@@ -274,8 +274,8 @@ class StayDuration(QWidget):
     def mark_past_dates(self, *args):
         """Shades every date before today so it looks unselectable."""
         past = QTextCharFormat()
-        past.setForeground(QColor("#9aa3b2"))
-        past.setBackground(QColor("#eceef2"))
+        past.setForeground(QColor("#a8997f"))
+        past.setBackground(QColor("#efe6d4"))
 
         first = QDate(
             self.calendar.yearShown(), self.calendar.monthShown(), 1
