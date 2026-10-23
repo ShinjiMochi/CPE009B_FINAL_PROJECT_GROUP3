@@ -14,9 +14,6 @@ DISPLAY_FORMAT = "%b %d, %Y %I:%M %p"
 
 
 class StayCalendar(QCalendarWidget):
-    """Calendar that highlights the check-in day, the check-out day and
-    every day in between. Painted by hand so the app stylesheet can't hide it."""
-
     STAY_GOLD = QColor(ACCENT)
     STAY_TINT = QColor(156, 106, 29, 55)
 
