@@ -5,11 +5,15 @@ from PyQt6.QtWidgets import (
     QLabel, QSpinBox, QCheckBox, QPushButton, QMessageBox
 )
 
-from GuestRules import validate_guests, create_guest_info, MINIMUM_GUESTS
-from DiscountManager import apply_discount, DISCOUNT_RATE
-from widgets import ImageBox, IMAGE_FOLDER
+from logic import (
+    MINIMUM_GUESTS, DISCOUNT_RATE,
+    validate_guests, create_guest_info, calculate_totals
+)
+from ui_common import ImageBox, IMAGE_FOLDER, make_title, make_secondary_button
+
 
 class GuestOptions(QWidget):
+    # emits: guests, discount, services
     continued = pyqtSignal(dict)
     back_requested = pyqtSignal()
 
@@ -24,10 +28,8 @@ class GuestOptions(QWidget):
         form = QWidget()
         form_layout = QVBoxLayout(form)
 
-        title = QLabel("Guest Options")
-        title.setStyleSheet("font-size: 28px; font-weight: bold;")
         form_layout.addWidget(ImageBox("image", 700, 130))
-        form_layout.addWidget(title)
+        form_layout.addWidget(make_title("Guest Options"))
         form_layout.addWidget(self.make_guest_box())
         form_layout.addWidget(self.make_discount_box())
         form_layout.addWidget(self.make_services_box())
@@ -62,7 +64,6 @@ class GuestOptions(QWidget):
     def make_guest_box(self):
         box = QGroupBox("Guests")
         layout = QHBoxLayout(box)
-        layout.addWidget(ImageBox("family", 150, 150), alignment=Qt.AlignmentFlag.AlignTop)
 
         self.guest_spin = QSpinBox()
         self.guest_spin.setMinimum(MINIMUM_GUESTS)
@@ -126,17 +127,11 @@ class GuestOptions(QWidget):
             item = QVBoxLayout()
 
             image_name = service_images.get(name, "services")
-            
             item.addWidget(
-                ImageBox(
-                    image_name,
-                    150,
-                    100,
-                    folder=os.path.join(IMAGE_FOLDER, "services")
-                ),
+                ImageBox(image_name, 150, 100,
+                         folder=os.path.join(IMAGE_FOLDER, "services")),
                 alignment=Qt.AlignmentFlag.AlignCenter
             )
-
             item.addWidget(
                 QLabel(f"{name} - ₱{price:,.2f}"),
                 alignment=Qt.AlignmentFlag.AlignCenter
@@ -144,11 +139,7 @@ class GuestOptions(QWidget):
 
             checkbox = QCheckBox("Add")
             self.service_checkboxes[name] = checkbox
-
-            item.addWidget(
-                checkbox,
-                alignment=Qt.AlignmentFlag.AlignCenter
-            )
+            item.addWidget(checkbox, alignment=Qt.AlignmentFlag.AlignCenter)
 
             layout.addLayout(item, index // 3, index % 3)
 
@@ -168,7 +159,7 @@ class GuestOptions(QWidget):
         layout.addWidget(self.warning_label)
         layout.addStretch()
 
-        self.back_button = QPushButton("Back")
+        self.back_button = make_secondary_button("Back")
         self.continue_button = QPushButton("Continue")
         layout.addWidget(self.back_button)
         layout.addWidget(self.continue_button)
@@ -206,9 +197,12 @@ class GuestOptions(QWidget):
         ]
 
     def update_summary(self, *args):
-        discount = apply_discount(self.room_charge, self.discount_check.isChecked())
-        services_total = sum(item["price"] for item in self.get_selected_services())
-        total = discount["room_charge_after_discount"] + services_total
+        totals = calculate_totals(
+            self.room_charge,
+            self.discount_check.isChecked(),
+            self.get_selected_services()
+        )
+        discount = totals["discount"]
 
         self.summary_label.setText(
             f"Room: {self.room_name or '-'}\n"
@@ -216,8 +210,8 @@ class GuestOptions(QWidget):
             f"Room charge: ₱{discount['room_charge']:,.2f}\n"
             f"Discount: -₱{discount['discount_amount']:,.2f}\n"
             f"Room after discount: ₱{discount['room_charge_after_discount']:,.2f}\n"
-            f"Services: ₱{services_total:,.2f}\n\n"
-            f"Total so far: ₱{total:,.2f}\n"
+            f"Services: ₱{totals['services_total']:,.2f}\n\n"
+            f"Total so far: ₱{totals['total']:,.2f}\n"
             "(dining is added later)"
         )
 
@@ -242,14 +236,13 @@ class GuestOptions(QWidget):
             QMessageBox.warning(self, "Invalid Guest Information", str(error))
             return
 
-        selected_services = self.get_selected_services()
-        services_total = sum(item["price"] for item in selected_services)
-
+        services = self.get_selected_services()
         self.continued.emit({
             "guests": guest_info.to_dict(),
-            "discount": apply_discount(self.room_charge, self.discount_check.isChecked()),
-            "services": selected_services,
-            "services_total": round(services_total, 2)
+            "discount": calculate_totals(
+                self.room_charge, self.discount_check.isChecked(), services
+            )["discount"],
+            "services": services
         })
 
 
@@ -257,11 +250,13 @@ if __name__ == "__main__":
     import sys
     from PyQt6.QtWidgets import QApplication
 
-    from Services import get_additional_services
+    from logic import get_additional_services
+    from ui_common import apply_theme
 
     app = QApplication(sys.argv)
+    apply_theme(app)
     screen = GuestOptions(get_additional_services())
-    screen.set_room_charge(1500, "Econo")
+    screen.set_room_charge(1500, "Economy")
     screen.continued.connect(print)
     screen.resize(1100, 700)
     screen.show()
