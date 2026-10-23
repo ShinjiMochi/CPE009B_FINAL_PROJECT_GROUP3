@@ -60,7 +60,7 @@ class GuestOptions(QWidget):
     def make_note(self, text):
         note = QLabel(text)
         note.setWordWrap(True)
-        note.setStyleSheet("color: gray; font-size: 12px;")
+        note.setObjectName("muted")
         return note
 
     def make_guest_box(self):
@@ -184,7 +184,6 @@ class GuestOptions(QWidget):
         self.update_summary()
 
     def reset(self):
-        """Clears the screen for a new booking."""
         self.guest_spin.setValue(MINIMUM_GUESTS)
         self.family_check.setChecked(False)
         self.discount_check.setChecked(False)
