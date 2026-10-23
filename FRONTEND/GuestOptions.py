@@ -92,7 +92,7 @@ class GuestOptions(QWidget):
         return box
 
     def make_discount_box(self):
-        box = QGroupBox("Discount Account (optional)")
+        box = QGroupBox("Discount (optional)")
         layout = QHBoxLayout(box)
         layout.addWidget(
             ImageBox("images/discount", 70, 70),
@@ -100,7 +100,7 @@ class GuestOptions(QWidget):
         )
 
         self.discount_check = QCheckBox(
-            f"Use discount account ({DISCOUNT_RATE * 100:.0f}% off room charges only)"
+            f"Apply {DISCOUNT_RATE * 100:.0f}% promotional discount"
         )
         right = QVBoxLayout()
         right.addWidget(self.discount_check)
