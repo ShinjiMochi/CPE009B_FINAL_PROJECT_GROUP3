@@ -6,9 +6,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout, QLabel, QLayout, QPushButton, QSizePolicy
 )
  
-# =====================================================================
 # Theme
-# =====================================================================
 BLUE = "#1a56db"
 BLUE_DARK = "#1446b5"
 BORDER = "#e3e6ea"
@@ -209,11 +207,8 @@ def apply_theme(app):
             .replace("DOWN_PATH", make_arrow_icon("arrow_down.png", False))
         )
     app.setStyleSheet(STYLESHEET + styles)
- 
- 
-# =====================================================================
+
 # Images
-# =====================================================================
 BASE_FOLDER = os.path.dirname(os.path.abspath(__file__))
 IMAGE_FOLDER = BASE_FOLDER                              # banners, icons, "images/Econo" etc.
 FOODS_FOLDER = os.path.join(BASE_FOLDER, "foods")       # dining pictures
@@ -290,14 +285,10 @@ class BannerBox(QLabel):
             Qt.TransformationMode.SmoothTransformation
         ))
  
- 
-# =====================================================================
+
 # Layout and screen helpers
-# =====================================================================
 class FlowLayout(QLayout):
-    """Lays widgets out left to right and wraps to a new row when the
-    space runs out, so the amenity chips never push the card too wide."""
- 
+
     def __init__(self, spacing=6):
         super().__init__()
         self._items = []
