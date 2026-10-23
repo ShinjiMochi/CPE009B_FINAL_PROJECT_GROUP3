@@ -9,7 +9,9 @@ from logic import (
     MINIMUM_GUESTS, DISCOUNT_RATE,
     validate_guests, create_guest_info, calculate_totals
 )
-from ui_common import ImageBox, IMAGE_FOLDER, make_title, make_secondary_button
+from ui_common import (
+    ImageBox, BannerBox, IMAGE_FOLDER, make_title, make_secondary_button
+)
 
 
 class GuestOptions(QWidget):
@@ -28,7 +30,7 @@ class GuestOptions(QWidget):
         form = QWidget()
         form_layout = QVBoxLayout(form)
 
-        form_layout.addWidget(ImageBox("images/guest_banner", 700, 250))
+        form_layout.addWidget(BannerBox("images/guest_banner", max_height=250))
         form_layout.addWidget(make_title("Guest Options"))
         form_layout.addWidget(self.make_guest_box())
         form_layout.addWidget(self.make_discount_box())
