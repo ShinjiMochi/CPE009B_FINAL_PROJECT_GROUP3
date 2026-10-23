@@ -28,7 +28,7 @@ class GuestOptions(QWidget):
         form = QWidget()
         form_layout = QVBoxLayout(form)
 
-        form_layout.addWidget(ImageBox("image", 700, 130))
+        form_layout.addWidget(ImageBox("images/guest_banner", 700, 250))
         form_layout.addWidget(make_title("Guest Options"))
         form_layout.addWidget(self.make_guest_box())
         form_layout.addWidget(self.make_discount_box())
@@ -92,7 +92,10 @@ class GuestOptions(QWidget):
     def make_discount_box(self):
         box = QGroupBox("Discount Account (optional)")
         layout = QHBoxLayout(box)
-        layout.addWidget(ImageBox("discount", 100, 100), alignment=Qt.AlignmentFlag.AlignTop)
+        layout.addWidget(
+            ImageBox("images/discount", 70, 70),
+            alignment=Qt.AlignmentFlag.AlignTop
+        )
 
         self.discount_check = QCheckBox(
             f"Use discount account ({DISCOUNT_RATE * 100:.0f}% off room charges only)"
