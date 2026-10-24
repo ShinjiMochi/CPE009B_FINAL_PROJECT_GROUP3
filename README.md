@@ -1,9 +1,6 @@
-https://github.com/ShinjiMochi/CPE009B_FINAL_PROJECT_GROUP3/blob/main/CPE%20009B_HOTEL.png
-
 ![Header](https://github.com/ShinjiMochi/CPE009B_FINAL_PROJECT_GROUP3/blob/main/CPE%20009B_HOTEL.png)
 
-<h1 align="center">Hi, This is Group 3! 💜</h1>
-<h3 align="center"> Aurevelle Hotel </h3>
+<h1 align="center"> Aurevelle Hotel </h3>
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
