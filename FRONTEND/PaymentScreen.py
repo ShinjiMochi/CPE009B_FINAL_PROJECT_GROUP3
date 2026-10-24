@@ -9,13 +9,16 @@ from logic import calculate_totals, format_when
 from managers import get_payment_methods
 from ui_common import make_title, make_nav_buttons
 
+# screen to show the summary and let the user choose how to pay (demo only, always approved)
 class PaymentScreen(QWidget):
-    pay_requested = pyqtSignal(dict)    # {"method", "provider", "details"}
+    # pay_requested sends the method, provider and details to main.py
+    pay_requested = pyqtSignal(dict)    
     back_requested = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.total = 0.0
+        # dictionary of payment methods and their options, from managers.py
         self.methods = get_payment_methods()
 
         # ----- summary -----
@@ -36,12 +39,14 @@ class PaymentScreen(QWidget):
         top.addRow("Method:", self.method_combo)
         pay_layout.addLayout(top)
 
+        # options like GCash or Maya. hidden if the method has none
         self.provider_box = QWidget()
         provider_form = QFormLayout(self.provider_box)
         self.provider_combo = QComboBox()
         provider_form.addRow("Option:", self.provider_combo)
         pay_layout.addWidget(self.provider_box)
 
+        # only shows when Cash is picked
         self.cash_box = QWidget()
         cash_form = QFormLayout(self.cash_box)
         self.tendered_spin = QDoubleSpinBox()
@@ -51,6 +56,7 @@ class PaymentScreen(QWidget):
         cash_form.addRow("Amount tendered:", self.tendered_spin)
         pay_layout.addWidget(self.cash_box)
 
+        # only shows when Card is picked
         self.card_box = QWidget()
         card_form = QFormLayout(self.card_box)
         self.card_number_input = QLineEdit()
@@ -62,6 +68,7 @@ class PaymentScreen(QWidget):
         self.card_holder_input = QLineEdit()
         self.card_holder_input.setPlaceholderText("Letters and spaces only")
         self.card_holder_input.setMaxLength(40)
+        # letters and spaces only
         self.card_holder_input.setValidator(
             QRegularExpressionValidator(QRegularExpression(r"[\p{L} ]*"))
         )
@@ -84,9 +91,11 @@ class PaymentScreen(QWidget):
 
         back.clicked.connect(self.back_requested.emit)
         self.pay_button.clicked.connect(self.on_pay)
+        # when the method changes, show the right fields
         self.method_combo.currentTextChanged.connect(self.update_method_fields)
         self.update_method_fields()
 
+    # updates the options and shows only the fields for the chosen method
     def update_method_fields(self, *args):
         method = self.method_combo.currentText()
         providers = self.methods.get(method, [])
@@ -100,6 +109,7 @@ class PaymentScreen(QWidget):
 
     def set_summary(self, data):
         """data is the booking dict collected by main.py."""
+        # compute the final total, now with dining included
         totals = calculate_totals(
             data["room_charge"],
             data["discount"]["discount_used"],
@@ -133,9 +143,11 @@ class PaymentScreen(QWidget):
         lines += ["", f"<b>TOTAL: ₱{self.total:,.2f}</b>"]
 
         self.summary_label.setText("<br>".join(lines))
+        # cash amount starts as the exact total
         self.tendered_spin.setValue(self.total)
         self.pay_button.setText(f"Pay ₱{self.total:,.2f}")
 
+    # gets what the user chose. the payment is really processed later in main.py
     def on_pay(self):
         method = self.method_combo.currentText()
         provider = self.provider_combo.currentText() or None
@@ -153,6 +165,7 @@ class PaymentScreen(QWidget):
             "details": details
         })
 
+    # clears the inputs for a new booking
     def reset(self):
         self.method_combo.setCurrentIndex(0)
         self.card_number_input.clear()
