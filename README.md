@@ -4,7 +4,7 @@
 
 ----------------------------------------------------------------------------------------------------------------------------------
 
-## 🙎 About our Hotel
+## 🙎 About Us
 - "A gold place of elegance and luxury"
 - A 5-star Hotel 
 - Located at BGC, Makati City
