@@ -1,0 +1,37 @@
+====================================================
+                HOTEL BOOKING SYSTEM                
+                  OFFICIAL RECEIPT                  
+====================================================
+Booking Number : 00001
+Date           : October 23, 2026 09:49 PM
+Customer       : JOHN DOE
+Contact        : 09456456123
+Email          : johndoe@gmail.com
+Address        : dasdasdsafas
+Room           : Deluxe
+Stay           : 3 day(s)
+Check-in       : October 23, 2026 10:00 PM
+Check-out      : October 26, 2026 10:00 PM
+Guests         : 2 (adults 2, seniors 0, children 0)
+----------------------------------------------------
+Room charge                             PHP 5,850.00
+Extra Pillow & Blanket Set                PHP 150.00
+Laundry Service                           PHP 350.00
+Spa Massage                             PHP 1,500.00
+1 x Fruit Platter                         PHP 500.00
+1 x Cheese Burger                         PHP 300.00
+1 x Caesar Salad                          PHP 600.00
+1 x Egg Drop Soup                         PHP 550.00
+1 x Carbonara                             PHP 450.00
+1 x All-Meat Pizza                      PHP 1,100.00
+----------------------------------------------------
+TOTAL                                  PHP 11,350.00
+----------------------------------------------------
+Payment Method : Card
+Provider       : Credit Card
+Card           : **** **** **** 7326
+Reference      : PAY-20261023214939-126
+Status         : Approved
+====================================================
+           Thank you for staying with us!           
+====================================================

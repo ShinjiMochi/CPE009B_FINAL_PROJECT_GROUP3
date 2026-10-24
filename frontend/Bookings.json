@@ -1,0 +1,377 @@
+[
+  {
+    "booking_number": 1,
+    "created_at": "2026-10-23T21:49:39",
+    "customer_name": "JOHN DOE",
+    "contact_number": "09456456123",
+    "email": "johndoe@gmail.com",
+    "address": "dasdasdsafas",
+    "special_requests": "",
+    "room_type": "Deluxe",
+    "duration_type": "Daily",
+    "duration": 3,
+    "check_in": "2026-10-23T22:00",
+    "check_out": "2026-10-26T22:00",
+    "guests": {
+      "total_guests": 2,
+      "is_family": false,
+      "seniors": 0,
+      "children": 0,
+      "adults": 2
+    },
+    "room_charge": 5850,
+    "discount": {
+      "room_charge": 5850,
+      "discount_used": false,
+      "discount_rate": 0.0,
+      "discount_amount": 0.0,
+      "room_charge_after_discount": 5850.0
+    },
+    "services": [
+      {
+        "name": "Extra Pillow & Blanket Set",
+        "price": 150.0
+      },
+      {
+        "name": "Laundry Service",
+        "price": 350.0
+      },
+      {
+        "name": "Spa Massage",
+        "price": 1500.0
+      }
+    ],
+    "dining": [
+      {
+        "name": "Fruit Platter",
+        "price": 500.0,
+        "quantity": 1,
+        "amount": 500.0
+      },
+      {
+        "name": "Cheese Burger",
+        "price": 300.0,
+        "quantity": 1,
+        "amount": 300.0
+      },
+      {
+        "name": "Caesar Salad",
+        "price": 600.0,
+        "quantity": 1,
+        "amount": 600.0
+      },
+      {
+        "name": "Egg Drop Soup",
+        "price": 550.0,
+        "quantity": 1,
+        "amount": 550.0
+      },
+      {
+        "name": "Carbonara",
+        "price": 450.0,
+        "quantity": 1,
+        "amount": 450.0
+      },
+      {
+        "name": "All-Meat Pizza",
+        "price": 1100.0,
+        "quantity": 1,
+        "amount": 1100.0
+      }
+    ],
+    "total_price": 11350.0,
+    "payment": {
+      "method": "Card",
+      "provider": "Credit Card",
+      "amount": 11350.0,
+      "currency": "PHP",
+      "status": "Approved",
+      "reference": "PAY-20261023214939-126",
+      "paid_at": "2026-10-23T21:49:39",
+      "card_last4": "7326",
+      "card_holder": "BDO"
+    },
+    "payment_status": "Paid"
+  },
+  {
+    "booking_number": 2,
+    "created_at": "2026-10-23T21:55:40",
+    "customer_name": "dasdasd",
+    "contact_number": "09434234234",
+    "email": "ajsdljas@gmail.com",
+    "address": "fsadsafds",
+    "special_requests": "",
+    "room_type": "Economy",
+    "duration_type": "Daily",
+    "duration": 1,
+    "check_in": "2026-10-23T22:00",
+    "check_out": "2026-10-24T22:00",
+    "guests": {
+      "total_guests": 2,
+      "is_family": false,
+      "seniors": 0,
+      "children": 0,
+      "adults": 2
+    },
+    "room_charge": 1500,
+    "discount": {
+      "room_charge": 1500,
+      "discount_used": true,
+      "discount_rate": 0.1,
+      "discount_amount": 150.0,
+      "room_charge_after_discount": 1350.0
+    },
+    "services": [],
+    "dining": [
+      {
+        "name": "Egg Drop Soup",
+        "price": 550.0,
+        "quantity": 1,
+        "amount": 550.0
+      }
+    ],
+    "total_price": 1900.0,
+    "payment": {
+      "method": "E-Wallet / E-Banking",
+      "provider": "Maya",
+      "amount": 1900.0,
+      "currency": "PHP",
+      "status": "Approved",
+      "reference": "PAY-20261023215540-472",
+      "paid_at": "2026-10-23T21:55:40"
+    },
+    "payment_status": "Paid"
+  },
+  {
+    "booking_number": 3,
+    "created_at": "2026-10-23T22:08:14",
+    "customer_name": "Lhian Chi",
+    "contact_number": "09465213216",
+    "email": "lchi@gmail.com",
+    "address": "dasdsadasda",
+    "special_requests": "",
+    "room_type": "Economy",
+    "duration_type": "Daily",
+    "duration": 7,
+    "check_in": "2026-10-23T23:00",
+    "check_out": "2026-10-30T23:00",
+    "guests": {
+      "total_guests": 2,
+      "is_family": false,
+      "seniors": 0,
+      "children": 0,
+      "adults": 2
+    },
+    "room_charge": 10500,
+    "discount": {
+      "room_charge": 10500,
+      "discount_used": true,
+      "discount_rate": 0.1,
+      "discount_amount": 1050.0,
+      "room_charge_after_discount": 9450.0
+    },
+    "services": [
+      {
+        "name": "Extra Bed",
+        "price": 500.0
+      },
+      {
+        "name": "Extra Pillow & Blanket Set",
+        "price": 150.0
+      },
+      {
+        "name": "Laundry Service",
+        "price": 350.0
+      },
+      {
+        "name": "Late Check-out",
+        "price": 600.0
+      },
+      {
+        "name": "Airport Transfer",
+        "price": 1200.0
+      },
+      {
+        "name": "Spa Massage",
+        "price": 1500.0
+      }
+    ],
+    "dining": [
+      {
+        "name": "Cheese Burger",
+        "price": 300.0,
+        "quantity": 1,
+        "amount": 300.0
+      },
+      {
+        "name": "Fruit Platter",
+        "price": 500.0,
+        "quantity": 1,
+        "amount": 500.0
+      },
+      {
+        "name": "Caesar Salad",
+        "price": 600.0,
+        "quantity": 1,
+        "amount": 600.0
+      },
+      {
+        "name": "Egg Drop Soup",
+        "price": 550.0,
+        "quantity": 1,
+        "amount": 550.0
+      },
+      {
+        "name": "Carbonara",
+        "price": 450.0,
+        "quantity": 2,
+        "amount": 900.0
+      },
+      {
+        "name": "All-Meat Pizza",
+        "price": 1100.0,
+        "quantity": 1,
+        "amount": 1100.0
+      }
+    ],
+    "total_price": 17700.0,
+    "payment": {
+      "method": "Card",
+      "provider": "Credit Card",
+      "amount": 17700.0,
+      "currency": "PHP",
+      "status": "Approved",
+      "reference": "PAY-20261023220814-609",
+      "paid_at": "2026-10-23T22:08:14",
+      "card_last4": "5498",
+      "card_holder": "BDO"
+    },
+    "payment_status": "Paid"
+  },
+  {
+    "booking_number": 4,
+    "created_at": "2026-10-24T10:37:47",
+    "customer_name": "Ally M.",
+    "contact_number": "09665572281",
+    "email": "allyjm22@gmail.com",
+    "address": "HIII",
+    "special_requests": "",
+    "room_type": "Premium",
+    "duration_type": "Daily",
+    "duration": 5,
+    "check_in": "2026-10-24T11:00",
+    "check_out": "2026-10-29T11:00",
+    "guests": {
+      "total_guests": 3,
+      "is_family": true,
+      "seniors": 0,
+      "children": 1,
+      "adults": 2
+    },
+    "room_charge": 10000,
+    "discount": {
+      "room_charge": 10000,
+      "discount_used": false,
+      "discount_rate": 0.0,
+      "discount_amount": 0.0,
+      "room_charge_after_discount": 10000.0
+    },
+    "services": [],
+    "dining": [
+      {
+        "name": "All-Meat Pizza",
+        "price": 1100.0,
+        "quantity": 1,
+        "amount": 1100.0
+      },
+      {
+        "name": "Fruit Platter",
+        "price": 500.0,
+        "quantity": 1,
+        "amount": 500.0
+      },
+      {
+        "name": "Caesar Salad",
+        "price": 600.0,
+        "quantity": 1,
+        "amount": 600.0
+      },
+      {
+        "name": "Egg Drop Soup",
+        "price": 550.0,
+        "quantity": 1,
+        "amount": 550.0
+      },
+      {
+        "name": "Carbonara",
+        "price": 450.0,
+        "quantity": 1,
+        "amount": 450.0
+      }
+    ],
+    "total_price": 13200.0,
+    "payment": {
+      "method": "Cash",
+      "provider": null,
+      "amount": 13200.0,
+      "currency": "PHP",
+      "status": "Approved",
+      "reference": "PAY-20261024103747-152",
+      "paid_at": "2026-10-24T10:37:47",
+      "amount_tendered": 13200.0,
+      "change": 0.0
+    },
+    "payment_status": "Paid"
+  },
+  {
+    "booking_number": 5,
+    "created_at": "2026-10-24T10:40:55",
+    "customer_name": "Prinsipe",
+    "contact_number": "09745262278",
+    "email": "prinsipe@gmail.com",
+    "address": "TAGA No",
+    "special_requests": "",
+    "room_type": "Premium",
+    "duration_type": "Hourly",
+    "duration": 2,
+    "check_in": "2026-10-24T11:00",
+    "check_out": "2026-10-24T13:00",
+    "guests": {
+      "total_guests": 2,
+      "is_family": false,
+      "seniors": 0,
+      "children": 0,
+      "adults": 2
+    },
+    "room_charge": 291.67,
+    "discount": {
+      "room_charge": 291.67,
+      "discount_used": false,
+      "discount_rate": 0.0,
+      "discount_amount": 0.0,
+      "room_charge_after_discount": 291.67
+    },
+    "services": [],
+    "dining": [
+      {
+        "name": "Cheese Burger",
+        "price": 300.0,
+        "quantity": 1,
+        "amount": 300.0
+      }
+    ],
+    "total_price": 591.67,
+    "payment": {
+      "method": "Cash",
+      "provider": null,
+      "amount": 591.67,
+      "currency": "PHP",
+      "status": "Approved",
+      "reference": "PAY-20261024104055-982",
+      "paid_at": "2026-10-24T10:40:55",
+      "amount_tendered": 591.67,
+      "change": 0.0
+    },
+    "payment_status": "Paid"
+  }
+]

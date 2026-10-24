@@ -1,0 +1,94 @@
+{
+  "booking_number": 1,
+  "created_at": "2026-10-23T21:49:39",
+  "customer_name": "JOHN DOE",
+  "contact_number": "09456456123",
+  "email": "johndoe@gmail.com",
+  "address": "dasdasdsafas",
+  "special_requests": "",
+  "room_type": "Deluxe",
+  "duration_type": "Daily",
+  "duration": 3,
+  "check_in": "2026-10-23T22:00",
+  "check_out": "2026-10-26T22:00",
+  "guests": {
+    "total_guests": 2,
+    "is_family": false,
+    "seniors": 0,
+    "children": 0,
+    "adults": 2
+  },
+  "room_charge": 5850,
+  "discount": {
+    "room_charge": 5850,
+    "discount_used": false,
+    "discount_rate": 0.0,
+    "discount_amount": 0.0,
+    "room_charge_after_discount": 5850.0
+  },
+  "services": [
+    {
+      "name": "Extra Pillow & Blanket Set",
+      "price": 150.0
+    },
+    {
+      "name": "Laundry Service",
+      "price": 350.0
+    },
+    {
+      "name": "Spa Massage",
+      "price": 1500.0
+    }
+  ],
+  "dining": [
+    {
+      "name": "Fruit Platter",
+      "price": 500.0,
+      "quantity": 1,
+      "amount": 500.0
+    },
+    {
+      "name": "Cheese Burger",
+      "price": 300.0,
+      "quantity": 1,
+      "amount": 300.0
+    },
+    {
+      "name": "Caesar Salad",
+      "price": 600.0,
+      "quantity": 1,
+      "amount": 600.0
+    },
+    {
+      "name": "Egg Drop Soup",
+      "price": 550.0,
+      "quantity": 1,
+      "amount": 550.0
+    },
+    {
+      "name": "Carbonara",
+      "price": 450.0,
+      "quantity": 1,
+      "amount": 450.0
+    },
+    {
+      "name": "All-Meat Pizza",
+      "price": 1100.0,
+      "quantity": 1,
+      "amount": 1100.0
+    }
+  ],
+  "total_price": 11350.0,
+  "payment": {
+    "method": "Card",
+    "provider": "Credit Card",
+    "amount": 11350.0,
+    "currency": "PHP",
+    "status": "Approved",
+    "reference": "PAY-20261023214939-126",
+    "paid_at": "2026-10-23T21:49:39",
+    "card_last4": "7326",
+    "card_holder": "BDO"
+  },
+  "payment_status": "Paid"
+}
