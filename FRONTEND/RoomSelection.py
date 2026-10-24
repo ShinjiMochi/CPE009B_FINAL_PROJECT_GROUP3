@@ -9,11 +9,14 @@ from PyQt6.QtWidgets import (
 from logic import get_all_rooms
 from ui_common import ImageBox, FlowLayout
 
+# choices for the sort dropdown
 SORT_OPTIONS = ["Recommended", "Price: low to high", "Price: high to low"]
+# slider moves by 50 pesos. MAX_CHIPS is how many amenities show on a card before '+N more'
 PRICE_STEP = 50
 MAX_CHIPS = 4
 
 
+# makes a label, can set a style name and word wrap
 def make_label(text, name=None, word_wrap=False):
     label = QLabel(text)
     if name:
@@ -22,6 +25,7 @@ def make_label(text, name=None, word_wrap=False):
     return label
 
 
+# first step of booking: filter, sort and choose a room
 class RoomSelectionScreen(QWidget):
     room_selected = pyqtSignal(object)   # emits the chosen Room
 
@@ -29,6 +33,7 @@ class RoomSelectionScreen(QWidget):
         super().__init__()
         self.rooms = get_all_rooms()
 
+        # slider min and max come from the cheapest and most expensive room
         daily = [r.daily_rate for r in self.rooms.values()]
         self.price_min = int(math.floor(min(daily) / PRICE_STEP) * PRICE_STEP)
         self.price_max = int(math.ceil(max(daily) / PRICE_STEP) * PRICE_STEP)
@@ -57,6 +62,7 @@ class RoomSelectionScreen(QWidget):
         layout.addWidget(make_label("Popular filters", "sectionTitle"))
 
         self.amenity_checks = {}
+        # get every amenity one time only
         amenities = []
         for room in self.rooms.values():
             for amenity in room.amenities:
@@ -87,6 +93,7 @@ class RoomSelectionScreen(QWidget):
         return side
 
     # ---------- right: results ----------
+    # makes the sort bar and the scrollable list of room cards
     def make_results(self):
         column = QVBoxLayout()
 
@@ -121,6 +128,7 @@ class RoomSelectionScreen(QWidget):
         column.addWidget(scroll, 1)
         return column
 
+    # one room card: picture on the left, details in the middle, price and button on the right
     def make_card(self, room):
         card = QFrame()
         card.setObjectName("card")
@@ -137,6 +145,7 @@ class RoomSelectionScreen(QWidget):
         middle.addWidget(make_label(room.description, "muted", True))
         middle.addSpacing(6)
 
+        # amenity chips go to the next line when there's no space. extra ones become '+N more'
         chips = FlowLayout(6)
         for amenity in room.amenities[:MAX_CHIPS]:
             chips.addWidget(make_label(amenity, "chip"))
@@ -159,6 +168,7 @@ class RoomSelectionScreen(QWidget):
         right.addSpacing(6)
 
         button = QPushButton("Select room")
+        # r=room is needed so each button remembers its own room
         button.clicked.connect(
             lambda checked=False, r=room: self.room_selected.emit(r)
         )
@@ -167,7 +177,9 @@ class RoomSelectionScreen(QWidget):
         return card
 
     # ---------- filtering ----------
+    # filters and sorts the rooms based on what the user picked
     def visible_rooms(self):
+        # a room must have all the checked amenities
         wanted = [a for a, check in self.amenity_checks.items() if check.isChecked()]
         limit = self.price_slider.value()
 
@@ -183,9 +195,11 @@ class RoomSelectionScreen(QWidget):
             rooms.sort(key=lambda r: r.daily_rate, reverse=True)
         return rooms
 
+    # redraws the list of rooms using the current filters
     def rebuild(self, *args):
         self.price_label.setText(f"Up to ₱{self.price_slider.value():,}")
 
+        # remove the old cards first
         while self.cards_layout.count():
             item = self.cards_layout.takeAt(0)
             if item.widget():
@@ -201,6 +215,7 @@ class RoomSelectionScreen(QWidget):
         for room in rooms:
             self.cards_layout.addWidget(self.make_card(room))
 
+    # puts the filters back to default. signals are blocked so rebuild only runs once
     def reset(self):
         for widget in (self.sort_combo, self.price_slider,
                        *self.amenity_checks.values()):
