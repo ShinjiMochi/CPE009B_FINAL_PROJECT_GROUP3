@@ -8,25 +8,31 @@ from PyQt6.QtWidgets import (
 )
 
 from logic import calculate_price
-from ui_common import make_title, make_nav_buttons, TEXT, ACCENT
+from ui_common import make_title, make_nav_buttons, TEXT
 
+# how the dates and times are shown, like Oct 24, 2026 02:00 PM
 DISPLAY_FORMAT = "%b %d, %Y %I:%M %p"
 
 
 class StayCalendar(QCalendarWidget):
-    STAY_GOLD = QColor(ACCENT)
-    STAY_TINT = QColor(156, 106, 29, 55)
+    """Calendar that highlights the check-in day, the check-out day and
+    every day in between. Painted by hand so the app stylesheet can't hide it."""
+
+    STAY_BLUE = QColor("#1a56db")
+    STAY_TINT = QColor(26, 86, 219, 45)
 
     def __init__(self):
         super().__init__()
         self.stay_start = None
         self.stay_end = None
 
+    # saves the check-in and check-out dates and redraws the calendar
     def set_stay(self, start, end):
         """start and end are QDate values (check-in day, check-out day)."""
         self.stay_start, self.stay_end = start, end
         self.updateCells()
 
+    # draw the normal cell first, then the highlight on top
     def paintCell(self, painter, rect, date):
         super().paintCell(painter, rect, date)
 
@@ -37,6 +43,7 @@ class StayCalendar(QCalendarWidget):
         painter.save()
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
+        # check-in and check-out are solid blue, the days between are light blue
         if date == start and date == end:
             self._draw_solid(painter, rect, date, "Check-in / out")
         elif date == start:
@@ -49,8 +56,8 @@ class StayCalendar(QCalendarWidget):
         painter.restore()
 
     def _draw_solid(self, painter, rect, date, label):
-        """Solid gold cell with the day number and a small label under it."""
-        painter.fillRect(rect, self.STAY_GOLD)
+        """Solid blue cell with the day number and a small label under it."""
+        painter.fillRect(rect, self.STAY_BLUE)
         painter.setPen(QColor("white"))
 
         number_font = QFont(painter.font())
@@ -73,13 +80,14 @@ class StayCalendar(QCalendarWidget):
         )
 
 
+# second step: choose check-in date and time and how long to stay. shows the room charge
 class StayDuration(QWidget):
-    # emits: duration_type, duration, room_charge, check_in, check_out
     continued = pyqtSignal(dict)
     back_requested = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+        # set later when main.py gives us the chosen room
         self.room = None
 
         layout = QVBoxLayout(self)
@@ -96,6 +104,7 @@ class StayDuration(QWidget):
         self.rates_label = QLabel()
         layout.addWidget(self.rates_label)
 
+        # two columns: calendar on the left, time and duration on the right
         columns = QHBoxLayout()
 
         # ----- left: calendar -----
@@ -103,14 +112,17 @@ class StayDuration(QWidget):
         calendar_layout = QVBoxLayout(calendar_box)
         self.calendar = StayCalendar()
         self.calendar.setGridVisible(True)
+        # can't pick a date that already passed
         self.calendar.setMinimumDate(QDate.currentDate())
 
+        # sets the header and weekend text color so the app stylesheet doesn't make it hard to read
         day_format = QTextCharFormat()
         day_format.setForeground(QColor(TEXT))
         self.calendar.setHeaderTextFormat(day_format)
         self.calendar.setWeekdayTextFormat(Qt.DayOfWeek.Saturday, day_format)
         self.calendar.setWeekdayTextFormat(Qt.DayOfWeek.Sunday, day_format)
 
+        # shade the past dates again when the month changes
         self.calendar.currentPageChanged.connect(self.mark_past_dates)
 
         self.calendar.setVerticalHeaderFormat(
@@ -171,6 +183,7 @@ class StayDuration(QWidget):
 
         back.clicked.connect(self.back_requested.emit)
         self.continue_button.clicked.connect(self.on_continue)
+        # anything that changes recalculates the check-out, price and warning
         self.hourly_radio.toggled.connect(self.update_total)
         self.duration_spin.valueChanged.connect(self.update_total)
         self.calendar.selectionChanged.connect(self.update_total)
@@ -180,6 +193,7 @@ class StayDuration(QWidget):
         self.mark_past_dates()
         self.update_total()
 
+    # returns 'Hourly' or 'Daily' based on the radio button
     def duration_type(self):
         return "Hourly" if self.hourly_radio.isChecked() else "Daily"
 
@@ -191,6 +205,7 @@ class StayDuration(QWidget):
         self.calendar.setSelectedDate(QDate(start.year, start.month, start.day))
         self.time_edit.setTime(QTime(start.hour, 0))
 
+    # combines the picked date and time into one datetime
     def get_check_in(self):
         date = self.calendar.selectedDate()
         time = self.time_edit.time()
@@ -198,11 +213,13 @@ class StayDuration(QWidget):
             date.year(), date.month(), date.day(), time.hour(), time.minute()
         )
 
+    # check-in plus the number of hours or days
     def get_check_out(self, check_in):
         if self.duration_type() == "Hourly":
             return check_in + timedelta(hours=self.duration_spin.value())
         return check_in + timedelta(days=self.duration_spin.value())
 
+    # main.py calls this when a room is picked
     def set_room(self, room):
         self.room = room
         self.room_label.setText(f"Selected Room: {room.room_type}")
@@ -213,14 +230,17 @@ class StayDuration(QWidget):
         )
         self.update_total()
 
+    # check-in can't be earlier than right now
     def check_in_is_valid(self, check_in):
         return check_in >= datetime.now().replace(second=0, microsecond=0)
 
+    # updates the labels, calendar, warning and price. Continue only works if the check-in is valid
     def update_total(self, *args):
         hourly = self.duration_type() == "Hourly"
         self.duration_label.setText(
             "Number of hours:" if hourly else "Number of days:"
         )
+        # hourly is up to 23 hours only, for longer use per day
         self.duration_spin.setRange(1, 23 if hourly else 365)
 
         check_in = self.get_check_in()
@@ -248,6 +268,7 @@ class StayDuration(QWidget):
         self.total_label.setText(f"Room charge: ₱{total:,.2f}")
         self.continue_button.setEnabled(valid)
 
+    # checks again, then sends the stay info to main.py (dates are saved as text)
     def on_continue(self):
         if self.room is None:
             return
@@ -271,18 +292,20 @@ class StayDuration(QWidget):
     def mark_past_dates(self, *args):
         """Shades every date before today so it looks unselectable."""
         past = QTextCharFormat()
-        past.setForeground(QColor("#a8997f"))
-        past.setBackground(QColor("#efe6d4"))
+        past.setForeground(QColor("#9aa3b2"))
+        past.setBackground(QColor("#eceef2"))
 
         first = QDate(
             self.calendar.yearShown(), self.calendar.monthShown(), 1
         ).addDays(-7)             
         today = QDate.currentDate()
+        # a calendar page can show about 6 weeks so we check 50 days
         for offset in range(50):
             day = first.addDays(offset)
             if day < today:
                 self.calendar.setDateTextFormat(day, past)
 
+    # puts the stay settings back to default
     def reset(self):
         self.daily_radio.setChecked(True)
         self.duration_spin.setValue(1)
