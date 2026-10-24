@@ -14,19 +14,23 @@ from ui_common import (
 )
 
 
+# screen for number of guests, discount and extra services. it also shows the price so far
 class GuestOptions(QWidget):
-    # emits: guests, discount, services
     continued = pyqtSignal(dict)
     back_requested = pyqtSignal()
 
     def __init__(self, services=None):
         super().__init__()
 
+        # services is a dictionary of {name: price} from logic.py
         self.services = services or {}
+        # stores the checkbox of each service
         self.service_checkboxes = {}
+        # these get filled in later by set_room_charge()
         self.room_name = ""
         self.room_charge = 0.0
 
+        # left side is the form, put inside a scroll area
         form = QWidget()
         form_layout = QVBoxLayout(form)
 
@@ -37,14 +41,17 @@ class GuestOptions(QWidget):
         form_layout.addWidget(self.make_services_box())
         form_layout.addStretch()
 
+        # scroll area so it still fits in a small window
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(form)
 
+        # form is 3 parts wide, summary is 1 part
         layout = QHBoxLayout(self)
         layout.addWidget(scroll, 3)
         layout.addWidget(self.make_summary_box(), 1)
 
+        # whenever something changes, update the summary
         self.family_check.toggled.connect(self.toggle_family_fields)
         self.guest_spin.valueChanged.connect(self.update_summary)
         self.senior_spin.valueChanged.connect(self.update_summary)
@@ -57,12 +64,14 @@ class GuestOptions(QWidget):
 
         self.update_summary()
 
+    # makes a small gray note label
     def make_note(self, text):
         note = QLabel(text)
         note.setWordWrap(True)
         note.setObjectName("muted")
         return note
 
+    # box for number of guests and the family option
     def make_guest_box(self):
         box = QGroupBox("Guests")
         layout = QHBoxLayout(box)
@@ -73,6 +82,7 @@ class GuestOptions(QWidget):
         self.family_check = QCheckBox("This is a family booking")
         self.senior_spin = QSpinBox()
         self.child_spin = QSpinBox()
+        # seniors and children are only for family bookings so they start disabled
         self.senior_spin.setEnabled(False)
         self.child_spin.setEnabled(False)
 
@@ -91,8 +101,9 @@ class GuestOptions(QWidget):
         layout.addLayout(grid, 1)
         return box
 
+    # box for the optional discount account
     def make_discount_box(self):
-        box = QGroupBox("Discount (optional)")
+        box = QGroupBox("Discount Account (optional)")
         layout = QHBoxLayout(box)
         layout.addWidget(
             ImageBox("images/discount", 70, 70),
@@ -100,7 +111,7 @@ class GuestOptions(QWidget):
         )
 
         self.discount_check = QCheckBox(
-            f"Apply {DISCOUNT_RATE * 100:.0f}% promotional discount"
+            f"Use discount account ({DISCOUNT_RATE * 100:.0f}% off room charges only)"
         )
         right = QVBoxLayout()
         right.addWidget(self.discount_check)
@@ -112,10 +123,12 @@ class GuestOptions(QWidget):
         layout.addLayout(right, 1)
         return box
 
+    # shows each extra service with its picture, price and an Add checkbox
     def make_services_box(self):
         box = QGroupBox("Additional Services")
         layout = QGridLayout(box)
 
+        # service name -> name of its picture file
         service_images = {
             "Airport Transfer": "airport_transfer",
             "Extra Bed": "extra_bed",
@@ -146,10 +159,12 @@ class GuestOptions(QWidget):
             self.service_checkboxes[name] = checkbox
             item.addWidget(checkbox, alignment=Qt.AlignmentFlag.AlignCenter)
 
+            # 3 services per row
             layout.addLayout(item, index // 3, index % 3)
 
         return box
 
+    # right side: shows the price summary, warnings and the buttons
     def make_summary_box(self):
         box = QGroupBox("Booking Summary")
         box.setMinimumWidth(240)
@@ -170,6 +185,7 @@ class GuestOptions(QWidget):
         layout.addWidget(self.continue_button)
         return box
 
+    # turns the senior and children boxes on or off. if off, set them back to 0
     def toggle_family_fields(self, checked):
         self.senior_spin.setEnabled(checked)
         self.child_spin.setEnabled(checked)
@@ -178,12 +194,15 @@ class GuestOptions(QWidget):
             self.child_spin.setValue(0)
         self.update_summary()
 
+    # main.py calls this after the stay screen so we know the room price
     def set_room_charge(self, room_charge, room_name=""):
         self.room_charge = room_charge
         self.room_name = room_name
         self.update_summary()
 
+    # clears the screen for a new booking
     def reset(self):
+        """Clears the screen for a new booking."""
         self.guest_spin.setValue(MINIMUM_GUESTS)
         self.family_check.setChecked(False)
         self.discount_check.setChecked(False)
@@ -193,6 +212,7 @@ class GuestOptions(QWidget):
         self.room_name = ""
         self.update_summary()
 
+    # gets the services that are checked as a list of name and price
     def get_selected_services(self):
         return [
             {"name": name, "price": self.services[name]}
@@ -200,6 +220,7 @@ class GuestOptions(QWidget):
             if checkbox.isChecked()
         ]
 
+    # recomputes the totals and updates the summary text, also checks the guests
     def update_summary(self, *args):
         totals = calculate_totals(
             self.room_charge,
@@ -219,6 +240,7 @@ class GuestOptions(QWidget):
             "(dining is added later)"
         )
 
+        # the Continue button is disabled if the guest info is wrong
         errors = validate_guests(
             self.guest_spin.value(),
             self.family_check.isChecked(),
@@ -228,6 +250,7 @@ class GuestOptions(QWidget):
         self.warning_label.setText("\n".join(errors))
         self.continue_button.setEnabled(not errors)
 
+    # makes the guest info and sends the guests, discount and services to main.py
     def on_continue(self):
         try:
             guest_info = create_guest_info(
@@ -250,6 +273,7 @@ class GuestOptions(QWidget):
         })
 
 
+# lets us run this screen by itself to test it
 if __name__ == "__main__":
     import sys
     from PyQt6.QtWidgets import QApplication
