@@ -6,8 +6,8 @@ from PyQt6.QtWidgets import (
     QHBoxLayout, QLabel, QLayout, QPushButton, QSizePolicy
 )
  
-# Theme
 
+# Theme
 ACCENT = "#9c6a1d"         # bronze gold (buttons, active states)
 ACCENT_DARK = "#7d5415"    # button hover
 ACCENT_SOFT = "#f6ead2"    # light gold wash for hovers
@@ -19,6 +19,7 @@ BACKGROUND = "#faf5ea"
 MUTED = "#7a6650"
 TEXT = "#2e1c0e"
  
+# the stylesheet (like CSS) that gives the whole app its look
 STYLESHEET = f"""
 * {{
     font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -98,6 +99,7 @@ QSlider::handle:horizontal {{
     width: 14px; height: 14px; margin: -6px 0; border-radius: 8px;
 }}
 """
+# more styles for checkboxes, radio buttons, scrollbars, spinboxes and comboboxes. the icon paths get filled in by apply_theme
 EXTRA_STYLES = f"""
 QCheckBox::indicator {{
     width: 16px; height: 16px; border-radius: 4px;
@@ -154,8 +156,8 @@ QComboBox::drop-down {{
 QComboBox::down-arrow {{ image: url(DOWN_PATH); width: 10px; height: 10px; }}
 """
  
+# draws the checkmark picture one time, saves it, and returns the path
 def make_check_icon():
-    """Draws a white checkmark PNG once and returns its path."""
     from PyQt6.QtCore import QPointF
     from PyQt6.QtGui import QPainter, QPen
  
@@ -174,6 +176,7 @@ def make_check_icon():
         pixmap.save(path)
     return path.replace("\\", "/")
  
+# same idea but for the up and down arrows
 def make_arrow_icon(name, up):
     from PyQt6.QtCore import QPointF
     from PyQt6.QtGui import QPainter, QPolygonF
@@ -195,6 +198,7 @@ def make_arrow_icon(name, up):
         pixmap.save(path)
     return path.replace("\\", "/")
  
+# call this once when the app starts. sets the style, colors and stylesheet
 def apply_theme(app):
     app.setStyle("Fusion")
     palette = QPalette()
@@ -204,6 +208,7 @@ def apply_theme(app):
     palette.setColor(QPalette.ColorRole.Text, QColor(TEXT))
     palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#f3ecdd"))
     app.setPalette(palette)
+    # replace the placeholder names with the real icon paths
     styles = (
             EXTRA_STYLES
             .replace("CHECK_PATH", make_check_icon())
@@ -213,13 +218,16 @@ def apply_theme(app):
     app.setStyleSheet(STYLESHEET + styles)
  
  
+
 # Images
 BASE_FOLDER = os.path.dirname(os.path.abspath(__file__))
 IMAGE_FOLDER = BASE_FOLDER                              # banners, icons, "images/Econo" etc.
 FOODS_FOLDER = os.path.join(BASE_FOLDER, "foods")       # dining pictures
  
  
-class ImageBox(QLabel): 
+# a picture with a fixed size. if the file isn't found it shows a dashed placeholder (tries .jpg, .jpeg, .png)
+class ImageBox(QLabel):
+ 
     def __init__(self, name, width, height, folder=IMAGE_FOLDER):
         super().__init__()
         self.setFixedSize(width, height)
@@ -244,7 +252,9 @@ class ImageBox(QLabel):
             ))
  
  
-class BannerBox(QLabel): 
+# a wide banner that resizes with the window, up to max_height
+class BannerBox(QLabel):
+ 
     def __init__(self, name, max_height=250, folder=IMAGE_FOLDER):
         super().__init__()
         self.max_height = max_height
@@ -268,6 +278,7 @@ class BannerBox(QLabel):
         else:
             self.setFixedHeight(self.max_height)
  
+    # resize the banner picture to the new width
     def resizeEvent(self, event):
         super().resizeEvent(event)
         if self.source.isNull() or self.width() <= 0:
@@ -286,9 +297,8 @@ class BannerBox(QLabel):
  
  
 # Layout and screen helpers
+# puts widgets in a row and moves to the next row when there's no more space
 class FlowLayout(QLayout):
-    """Lays widgets out left to right and wraps to a new row when the
-    space runs out, so the amenity chips never push the card too wide."""
  
     def __init__(self, spacing=6):
         super().__init__()
@@ -330,6 +340,7 @@ class FlowLayout(QLayout):
             size = size.expandedTo(item.minimumSize())
         return size
  
+    # places the items row by row. if apply is False it only measures the height
     def _arrange(self, rect, apply):
         x, y, row_height = rect.x(), rect.y(), 0
         for item in self._items:
@@ -345,20 +356,22 @@ class FlowLayout(QLayout):
         return y + row_height - rect.y()
  
  
+# makes the big title label
 def make_title(text):
     title = QLabel(text)
     title.setStyleSheet("font-size: 28px; font-weight: bold;")
     return title
  
  
+# makes an outlined button (the 'secondary' look in the stylesheet)
 def make_secondary_button(text="Back"):
     button = QPushButton(text)
     button.setProperty("secondary", True)    # outlined look from the theme
     return button
  
  
+# returns the layout, back button and next button. Back is on the left, Continue on the right
 def make_nav_buttons(next_text="Continue", back=True, extra=()):
-    Returns (layout, back_button or None, next_button)."""
     row = QHBoxLayout()
  
     back_button = None
@@ -373,4 +386,3 @@ def make_nav_buttons(next_text="Continue", back=True, extra=()):
     next_button = QPushButton(next_text)
     row.addWidget(next_button)
     return row, back_button, next_button
- 
