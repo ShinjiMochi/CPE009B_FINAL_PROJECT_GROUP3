@@ -141,6 +141,7 @@ class HotelApp(QMainWindow):
     # guests -> details: save the guests, discount and services
     def on_guest_continued(self, guest_data):
         self.data.update(guest_data)   # guests, discount, services
+        self.customer.set_summary(self.data)   # show the booking so far on the details screen
         self.show_screen(self.customer)
 
     # details -> dining: save the customer info
