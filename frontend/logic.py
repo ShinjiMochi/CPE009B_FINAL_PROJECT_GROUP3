@@ -7,9 +7,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 
 
-# =====================================================================
 # Rooms
-# =====================================================================
 @dataclass
 class Room:
     room_type: str
@@ -93,9 +91,7 @@ def get_room(room_type):
 def get_all_rooms():
     return ROOM_DATA
 
-# =====================================================================
 #               Services and dining menu (prices in PHP)
-# =====================================================================
 
 ADDITIONAL_SERVICES = {
     "Extra Bed": 500.00,
@@ -142,9 +138,8 @@ def get_dining_menu():
     return {name: dict(item) for name, item in DINING_MENU.items()}
 
 
-# =====================================================================
 #           Pricing (the only place prices are calculated)
-# =====================================================================
+
 def calculate_price(room, duration_type, duration):
     """Room charge for ONE room for the stay. Hourly is capped at the daily
     rate so a long hourly stay never costs more than a full day."""
@@ -191,9 +186,7 @@ def rooms_summary(rooms):
     return ", ".join(f"{e['quantity']} x {e['room'].room_type}" for e in rooms)
 
 
-# =====================================================================
 #                 Discounts (details + ID / voucher checks)
-# =====================================================================
 # Only ONE discount per booking. It applies to the room charge only.
 DISCOUNT_TYPES = {
     "Senior Citizen": {
@@ -321,15 +314,16 @@ def calculate_totals(room_charge, discount=None, services=(), dining=()):
     }
 
 
-# =====================================================================
+
 #                   Cancellation fee (percent of the total)
-# =====================================================================
 # (hours before check-in, fee rate, text for the screen). First match wins.
+# 48 hours or more: free cancellation
+# 24 to less than 48 hours: 25% cancellation fee
+# Less than 24 hours: 50% cancellation fee
 CANCELLATION_POLICY = [
-    (168, 0.10, "7 days or more before check-in"),
-    (72, 0.25, "3 to 7 days before check-in"),
-    (24, 0.50, "1 to 3 days before check-in"),
-    (0, 1.00, "Less than 24 hours before check-in"),
+    (48, 0.00, "Free cancellation, 48 hours or more before check-in"),
+    (24, 0.25, "24 to 48 hours before check-in"),
+    (0, 0.50, "Less than 24 hours before check-in"),
 ]
 
 
@@ -420,9 +414,8 @@ def create_guest_info(total_guests, is_family=False, seniors=0, children=0,
     return GuestInfo(int(total_guests), is_family, int(seniors), int(children))
 
 
-# =====================================================================
+
 #                      Customer Information Rules
-# =====================================================================
 MAX_SPECIAL_REQUESTS = 500
 
 EMAIL_PATTERN = re.compile(
@@ -494,9 +487,8 @@ def create_customer_info(full_name, contact_number, email, address, special_requ
         "special_requests": (special_requests or "").strip(),
     }
 
-# =====================================================================
+
 #              Additional guests (names and contact numbers)
-# =====================================================================
 def validate_guest_list(guests):
     """guests: [{"name", "contact"}] for every guest AFTER the primary one.
     Name is required. Contact is optional but must be a valid mobile number
@@ -531,9 +523,8 @@ def create_guest_list(guests):
     ]
 
 
-# =====================================================================
+
 #                           Random Helper
-# =====================================================================
 def format_when(text, fmt="%b %d, %Y %I:%M %p"):
     """ISO string -> readable date, or "-" if it can't be read."""
     try:
