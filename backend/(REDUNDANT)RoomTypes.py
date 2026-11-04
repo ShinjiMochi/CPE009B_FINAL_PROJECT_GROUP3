@@ -6,7 +6,8 @@ class Room:
         daily_rate,
         description,
         amenities,
-        image
+        image,
+        max_guests=2
     ):
         self.room_type = room_type
         self.hourly_rate = hourly_rate
@@ -14,6 +15,7 @@ class Room:
         self.description = description
         self.amenities = amenities
         self.image = image
+        self.max_guests = max_guests
 
 
 ROOM_DATA = {
@@ -30,7 +32,8 @@ ROOM_DATA = {
             "Wi-Fi",
             "Smart TV"
         ],
-        image="Econo.jpg"
+        image="Econo.jpg",
+        max_guests=2,   # placeholder: set to your real capacity
     ),
 
     "Deluxe": Room(
@@ -46,7 +49,8 @@ ROOM_DATA = {
             "Wi-Fi",
             "Smart TV"
         ],
-        image="Deluxe.jpg"
+        image="Deluxe.jpg",
+        max_guests=3,   # placeholder: set to your real capacity
     ),
 
     "Premium": Room(
@@ -63,8 +67,43 @@ ROOM_DATA = {
             "Smart TV",
             "Mini refrigerator"
         ],
-        image="Premium.jpg"
-    )
+        image="Premium.jpg",
+        max_guests=4,   # placeholder: set to your real capacity
+    ),
+
+    "Family Suite": Room(
+        room_type="Family Suite",
+        hourly_rate=2400 / 12,
+        daily_rate=3200,
+        description="A spacious suite with a sofa bed, made for families.",
+        amenities=["Queen bed", "Sofa bed", "Air conditioning", "Private bathroom",
+                   "Hot shower", "Wi-Fi", "Smart TV", "Mini refrigerator"],
+        image="images/FamilySuite",
+        max_guests=6,
+    ),
+
+    "Executive Suite": Room(
+        room_type="Executive Suite",
+        hourly_rate=2800 / 12,
+        daily_rate=3800,
+        description="A suite with a king bed, work desk and bathtub.",
+        amenities=["King bed", "Air conditioning", "Private bathroom", "Bathtub",
+                   "Hot shower", "Wi-Fi", "Smart TV", "Mini refrigerator", "Work desk"],
+        image="images/Executive",
+        max_guests=5,
+    ),
+
+    "Presidential Suite": Room(
+        room_type="Presidential Suite",
+        hourly_rate=4800 / 12,
+        daily_rate=6500,
+        description="Our top suite with a living area and private balcony.",
+        amenities=["King bed", "Sofa bed", "Air conditioning", "Private bathroom",
+                   "Bathtub", "Hot shower", "Wi-Fi", "Smart TV", "Mini refrigerator",
+                   "Work desk", "Balcony"],
+        image="images/Presidential",
+        max_guests=10,
+    ),
 }
 
 
