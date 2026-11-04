@@ -134,3 +134,68 @@ Payment Status: Approved
 Amount Tendered: 591.67
 Change: 0.00
 ----------------------------------------
+Booking Number: 6
+Customer Name: John Doe
+Status: Confirmed
+Date: 2026-11-04T19:01:38
+Contact Number: 09123756134
+Email: JohnDoe@gmail.com
+Address: 123 New York, New York, United States
+Guest 1: John Doe | 09123756134
+Guest 2: Jane Doe | 09819246352
+Guest 3: Jimmy Doe | -
+General Requests: No Milk
+Rooms: 2 x Economy
+Duration: 1 Daily
+Check-in: 2026-11-04T19:00
+Check-out: 2026-11-05T19:00
+Guests: 3
+Seniors: 0
+Children: 1
+Room: 2 x Economy | 1500.00 each | 3000.00
+Room Charge: PHP 3,000.00
+Service: Extra Pillow & Blanket Set | 150.00 | 1 set: 2 pillows and 1 blanket, per stay.
+Service: Late Check-out | 600.00 | Check-out extended by up to 3 hours.
+Dining: Cheese Burger | 1 | 300.00
+Dining: Caesar Salad | 1 | 600.00
+Dining: All-Meat Pizza | 1 | 1100.00
+Total Price: PHP 5,750.00
+Payment Method: Cash
+Payment Reference: PAY-20261104190138-490
+Payment Status: Approved
+Cash Payment Location: Front Desk (Main Lobby)
+Amount Tendered: 5750.00
+Change: 0.00
+----------------------------------------
+Booking Number: 7
+Customer Name: John Doe
+Status: Confirmed
+Date: 2026-11-04T19:36:02
+Contact Number: 09802345706
+Email: JohnDoe@gmail.com
+Address: 123 New York, New York, United States
+Guest 1: John Doe | 09802345706
+Guest 2: Jane Doe | -
+General Requests: Jane Doe - Lactose Intolerant
+Rooms: 1 x Economy
+Duration: 1 Daily
+Check-in: 2026-11-04T20:00
+Check-out: 2026-11-05T20:00
+Guests: 2
+Seniors: 0
+Children: 0
+Room: 1 x Economy | 1500.00 each | 1500.00
+Room Charge: PHP 1,500.00
+Service: Late Check-out | 600.00 | Check-out extended by up to 3 hours.
+Service: Spa Massage | 1500.00 | 60-minute full-body massage for 1 guest.
+Dining: Egg Drop Soup | 1 | 550.00
+Dining: Carbonara | 1 | 450.00
+Dining: All-Meat Pizza | 1 | 1100.00
+Total Price: PHP 5,700.00
+Payment Method: Cash
+Payment Reference: PAY-20261104193602-819
+Payment Status: Approved
+Cash Payment Location: Front Desk (Main Lobby)
+Amount Tendered: 5700.00
+Change: 0.00
+----------------------------------------

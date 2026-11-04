@@ -6,11 +6,12 @@ from PyQt6.QtWidgets import QWidget, QLabel, QPushButton
 
 
 BASE_DIR = Path(__file__).resolve().parent
-BACKGROUND_PATH = BASE_DIR / "hotel_background.png"
+BACKGROUND_PATH = BASE_DIR / "images" / "hotel_background.png"
 
 
 class AurevelleMainMenu(QWidget):
     book_requested = pyqtSignal()
+    manage_requested = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -68,6 +69,23 @@ class AurevelleMainMenu(QWidget):
             self.book_requested.emit
         )
 
+        # small button for cancelling / looking up an existing booking
+        self.manage_button = QPushButton("Manage / Cancel Booking", self.content)
+        self.manage_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.manage_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.manage_button.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(43, 26, 13, 200);
+                color: #f7ecd6;
+                border: 1px solid #f0c674;
+                border-radius: 16px;
+                padding: 6px 18px;
+                font-weight: 600;
+            }
+            QPushButton:hover { background-color: rgba(43, 26, 13, 235); }
+        """)
+        self.manage_button.clicked.connect(self.manage_requested.emit)
+
         self.update_background()
 
     def resizeEvent(self, event):
@@ -113,5 +131,14 @@ class AurevelleMainMenu(QWidget):
             int(size.height() * 0.09),
         )
 
+        button_width, button_height = 210, 34
+        self.manage_button.setGeometry(
+            size.width() - button_width - 24,
+            size.height() - button_height - 20,
+            button_width,
+            button_height,
+        )
+
         self.content.raise_()
         self.book_button.raise_()
+        self.manage_button.raise_()

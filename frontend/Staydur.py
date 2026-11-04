@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
     QRadioButton, QSpinBox, QCalendarWidget, QTimeEdit
 )
 
-from logic import calculate_price
+from logic import price_rooms, rooms_summary, total_capacity
 from ui_common import make_title, make_nav_buttons, TEXT
 
 DISPLAY_FORMAT = "%b %d, %Y %I:%M %p"
@@ -82,7 +82,7 @@ class StayDuration(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.room = None
+        self.rooms = []     # [{"room": Room, "quantity": n}]
 
         layout = QVBoxLayout(self)
         layout.addWidget(make_title("Stay Duration"))
@@ -96,6 +96,7 @@ class StayDuration(QWidget):
         layout.addWidget(self.description_label)
 
         self.rates_label = QLabel()
+        self.rates_label.setWordWrap(True)
         layout.addWidget(self.rates_label)
 
         columns = QHBoxLayout()
@@ -205,14 +206,18 @@ class StayDuration(QWidget):
             return check_in + timedelta(hours=self.duration_spin.value())
         return check_in + timedelta(days=self.duration_spin.value())
 
-    def set_room(self, room):
-        self.room = room
-        self.room_label.setText(f"Selected Room: {room.room_type}")
-        self.description_label.setText(room.description)
-        self.rates_label.setText(
-            f"Hourly rate: ₱{room.hourly_rate:,.2f}    "
-            f"Daily rate: ₱{room.daily_rate:,.2f}"
+    def set_rooms(self, rooms):
+        self.rooms = rooms
+        self.room_label.setText(f"Selected: {rooms_summary(rooms)}")
+        self.description_label.setText(
+            f"The selected rooms sleep up to {total_capacity(rooms)} guests in total. "
+            "The same check-in and check-out apply to every room."
         )
+        self.rates_label.setText("\n".join(
+            f"{e['room'].room_type}: ₱{e['room'].hourly_rate:,.2f} per hour, "
+            f"₱{e['room'].daily_rate:,.2f} per day"
+            for e in rooms
+        ))
         self.update_total()
 
     def check_in_is_valid(self, check_in):
@@ -239,19 +244,19 @@ class StayDuration(QWidget):
         valid = self.check_in_is_valid(check_in)
         self.warning_label.setText("" if valid else "Check-in can't be in the past.")
 
-        if self.room is None:
+        if not self.rooms:
             self.total_label.setText("Room charge: ₱0.00")
             self.continue_button.setEnabled(False)
             return
 
-        total = calculate_price(
-            self.room, self.duration_type(), self.duration_spin.value()
+        _, total = price_rooms(
+            self.rooms, self.duration_type(), self.duration_spin.value()
         )
         self.total_label.setText(f"Room charge: ₱{total:,.2f}")
         self.continue_button.setEnabled(valid)
 
     def on_continue(self):
-        if self.room is None:
+        if not self.rooms:
             return
 
         check_in = self.get_check_in()
@@ -259,8 +264,8 @@ class StayDuration(QWidget):
             self.update_total()
             return
 
-        room_charge = calculate_price(
-            self.room, self.duration_type(), self.duration_spin.value()
+        _, room_charge = price_rooms(
+            self.rooms, self.duration_type(), self.duration_spin.value()
         )
         self.continued.emit({
             "duration_type": self.duration_type(),

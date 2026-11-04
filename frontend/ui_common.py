@@ -5,7 +5,9 @@ from PyQt6.QtGui import QColor, QPalette, QPixmap
 from PyQt6.QtWidgets import (
     QHBoxLayout, QLabel, QLayout, QPushButton, QSizePolicy
 )
- 
+
+ICON_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
+os.makedirs(ICON_FOLDER, exist_ok=True)
 
 # Theme
 ACCENT = "#9c6a1d"         # bronze gold (buttons, active states)
@@ -158,7 +160,7 @@ def make_check_icon():
     from PyQt6.QtCore import QPointF
     from PyQt6.QtGui import QPainter, QPen
  
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check.png")
+    path = os.path.join(ICON_FOLDER, "check.png")
     if not os.path.exists(path):
         pixmap = QPixmap(16, 16)
         pixmap.fill(Qt.GlobalColor.transparent)

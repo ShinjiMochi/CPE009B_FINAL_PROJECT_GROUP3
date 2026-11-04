@@ -3,11 +3,14 @@ import math
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QFrame, QScrollArea,
-    QLabel, QCheckBox, QComboBox, QSlider, QPushButton
+    QLabel, QCheckBox, QComboBox, QSlider, QPushButton, QSpinBox, QMessageBox
 )
 
-from logic import get_all_rooms
-from ui_common import ImageBox, FlowLayout
+from logic import (
+    MAX_ROOMS_PER_BOOKING, get_all_rooms, rooms_summary,
+    total_capacity, total_room_count
+)
+from ui_common import ImageBox, FlowLayout, make_secondary_button
 
 SORT_OPTIONS = ["Recommended", "Price: low to high", "Price: high to low"]
 PRICE_STEP = 50
@@ -23,11 +26,12 @@ def make_label(text, name=None, word_wrap=False):
 
 
 class RoomSelectionScreen(QWidget):
-    room_selected = pyqtSignal(object)   # emits the chosen Room
+    rooms_selected = pyqtSignal(list)   # [{"room": Room, "quantity": n}]
 
     def __init__(self):
         super().__init__()
         self.rooms = get_all_rooms()
+        self.selection = {}     # room type -> how many rooms
 
         daily = [r.daily_rate for r in self.rooms.values()]
         self.price_min = int(math.floor(min(daily) / PRICE_STEP) * PRICE_STEP)
@@ -119,6 +123,21 @@ class RoomSelectionScreen(QWidget):
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setWidget(holder)
         column.addWidget(scroll, 1)
+
+        # ----- selection bar: what is booked so far -----
+        bar = QFrame()
+        bar.setObjectName("card")
+        bar_row = QHBoxLayout(bar)
+        bar_row.setContentsMargins(14, 10, 14, 10)
+        self.basket_label = make_label("", None, True)
+        bar_row.addWidget(self.basket_label, 1)
+        self.clear_button = make_secondary_button("Clear")
+        self.clear_button.clicked.connect(self.clear_selection)
+        bar_row.addWidget(self.clear_button)
+        self.continue_button = QPushButton("Continue")
+        self.continue_button.clicked.connect(self.on_continue)
+        bar_row.addWidget(self.continue_button)
+        column.addWidget(bar)
         return column
 
     def make_card(self, room):
@@ -138,6 +157,7 @@ class RoomSelectionScreen(QWidget):
         middle.addSpacing(6)
 
         chips = FlowLayout(6)
+        chips.addWidget(make_label(f"Up to {room.max_guests} guests", "chip"))
         for amenity in room.amenities[:MAX_CHIPS]:
             chips.addWidget(make_label(amenity, "chip"))
         extra = len(room.amenities) - MAX_CHIPS
@@ -158,13 +178,57 @@ class RoomSelectionScreen(QWidget):
                         alignment=Qt.AlignmentFlag.AlignRight)
         right.addSpacing(6)
 
-        button = QPushButton("Select room")
+        buy = QHBoxLayout()
+        spin = QSpinBox()
+        spin.setRange(1, MAX_ROOMS_PER_BOOKING)
+        button = QPushButton("Add room")
         button.clicked.connect(
-            lambda checked=False, r=room: self.room_selected.emit(r)
+            lambda checked=False, r=room, s=spin: self.add_room(r, s.value())
         )
-        right.addWidget(button, alignment=Qt.AlignmentFlag.AlignRight)
+        buy.addWidget(spin)
+        buy.addWidget(button)
+        right.addLayout(buy)
         row.addLayout(right)
         return card
+
+    # ---------- selection ----------
+    def selected_rooms(self):
+        return [
+            {"room": self.rooms[name], "quantity": qty}
+            for name, qty in self.selection.items()
+        ]
+
+    def add_room(self, room, quantity):
+        if total_room_count(self.selected_rooms()) + quantity > MAX_ROOMS_PER_BOOKING:
+            QMessageBox.information(
+                self, "Room limit",
+                f"A booking can have up to {MAX_ROOMS_PER_BOOKING} rooms."
+            )
+            return
+        self.selection[room.room_type] = self.selection.get(room.room_type, 0) + quantity
+        self.update_basket()
+
+    def clear_selection(self):
+        self.selection.clear()
+        self.update_basket()
+
+    def update_basket(self):
+        rooms = self.selected_rooms()
+        if rooms:
+            self.basket_label.setText(
+                f"<b>Your rooms:</b> {rooms_summary(rooms)}  "
+                f"({total_room_count(rooms)} room(s), sleeps up to "
+                f"{total_capacity(rooms)} guests)"
+            )
+        else:
+            self.basket_label.setText("No rooms selected yet. Add one or more rooms to continue.")
+        self.continue_button.setEnabled(bool(rooms))
+        self.clear_button.setEnabled(bool(rooms))
+
+    def on_continue(self):
+        rooms = self.selected_rooms()
+        if rooms:
+            self.rooms_selected.emit(rooms)
 
     # ---------- filtering ----------
     def visible_rooms(self):
@@ -215,4 +279,6 @@ class RoomSelectionScreen(QWidget):
                        *self.amenity_checks.values()):
             widget.blockSignals(False)
 
+        self.selection.clear()
+        self.update_basket()
         self.rebuild()
